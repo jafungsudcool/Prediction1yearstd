@@ -16,7 +16,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     async jwt({ token, profile, account }) {
       if (profile && account) {
-        token.email = (profile as any).email;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        token.email = (profile as any).email; 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         token.name = (profile as any).name;
       }
       return token;

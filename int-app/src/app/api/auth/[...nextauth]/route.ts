@@ -39,7 +39,7 @@ export const authOptions: NextAuthOptions = {
         const userEmail = credentials.email.toLowerCase().trim();
         const adminEmails = [
           "655021000014@mail.rmutk.ac.th", 
-          "655021000659@mail.rmutk.ac.th", 
+      //   "655021000659@mail.rmutk.ac.th", 
         ].map(email => email.toLowerCase().trim());
 
         const role = adminEmails.includes(userEmail) ? "admin" : "user";
