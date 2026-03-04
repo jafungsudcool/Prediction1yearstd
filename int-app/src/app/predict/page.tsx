@@ -138,7 +138,7 @@ const PredictPage = () => {
 
         if (response.ok) {
           setIsModalOpen(false);
-          router.push("/historyuser"); 
+          window.location.href = "/historyuser"; 
         } else {
           const err = await response.json();
           alert(`บันทึกไม่สำเร็จ: ${err.details || err.error}`);
