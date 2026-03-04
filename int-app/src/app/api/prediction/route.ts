@@ -20,9 +20,9 @@ export async function POST(req: Request) {
     // 2. โหมดตั้งค่าโมเดล (Admin)
     if (body.mode === 'updateSettings') {
       const update = await prisma.modelSettings.upsert({
-        where: { id: 'current_config' },
-        update: { activeModel: body.modelName, selectedFactors: body.factors, trainingFileName: body.fileName },
-        create: { id: 'current_config', activeModel: body.modelName, selectedFactors: body.factors, trainingFileName: body.fileName },
+        where: { model_id: 'current_config' },
+        update: {selected_factors: body.factors, training_file_name: body.fileName },
+        create: { model_id: 'current_config', selected_factors: body.factors, training_file_name: body.fileName },
       });
       return NextResponse.json(update, { status: 201 });
     }
