@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model admin {
+  admin_id   String  @id @db.VarChar(12)
+  email      String  @unique(map: "unique_admin_email") @db.VarChar(30)
+  admin_name String? @db.VarChar
+}
+
+model curriculum_selection {
+  prediction_id      String         @id @db.VarChar(10)
+  student_id         String?        @db.VarChar(12)
+  model_id           String?        @db.VarChar(10)
+  recommended_course String?
+  prediction_date    DateTime?      @db.Date
+  user_name          String?        @db.VarChar
+  answer             String?
+  modelSettings      modelSettings? @relation(fields: [model_id], references: [model_id], onDelete: NoAction, onUpdate: NoAction, map: "model_id_fk")
+  user               user?          @relation(fields: [student_id], references: [student_id], onDelete: NoAction, onUpdate: NoAction, map: "student_id_fk")
+}
+
+model user {
+  student_id           String                 @id @db.VarChar(12)
+  email                String?                @unique(map: "unique_emai") @map("email") @db.VarChar(30)
+  user_name            String?                @db.VarChar
+  role                 String                 @default("user")
+  curriculum_selection curriculum_selection[]
+}
+
+model modelSettings {
+  model_id             String                 @id @db.VarChar(10)
+  model_name           String?                @db.VarChar(20)
+  type                 String?
+  selected_factors     String                 @map("selected_factors")
+  training_file_name   String?                @map("training_file_name")
+  train_date           DateTime?              @db.Date
+  curriculum_selection curriculum_selection[]
+
+  @@map("model_settings")
+}
