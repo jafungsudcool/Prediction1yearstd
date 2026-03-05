@@ -62,24 +62,29 @@ const PredictPage = () => {
   useEffect(() => {
     const initPage = async () => {
       if (typeof window !== 'undefined') {
-        const email = localStorage.getItem("email") || "";
-        const name = localStorage.getItem("name") || "";
+        // 1. ดึงค่าและตรวจสอบสะกด (ต้องตัวเล็กทั้งหมด 'email')
+        const savedEmail = localStorage.getItem("email");
+        const savedName = localStorage.getItem("name");
 
-        // ปรับเงื่อนไขให้ยืดหยุ่น ถ้าไม่มี email ให้ลองโหลดใหม่หรือไป login
-        if (!email) {
-          setInitialLoading(false);
+        // 2. ถ้าไม่มี Email ห้ามให้ทำแบบทดสอบต่อ (ต้องส่งไป Login)
+        if (!savedEmail) {
+          console.error("No email found in localStorage");
+          // แทนที่จะ return เฉยๆ ให้ส่งกลับไปหน้า Login
+          alert("เซสชันหมดอายุหรือยังไม่ได้เข้าสู่ระบบ กรุณา Login ใหม่");
+          router.push("/login"); 
           return;
         }
 
+        // 3. ถ้ามี Email ให้เซต State ตามปกติ
         setUser({
-          email: email,
-          name: name,
+          email: savedEmail,
+          name: savedName || "",
           role: localStorage.getItem("role") || "user"
         });
 
         try {
-          // ใช้ Relative Path เสมอเพื่อให้ Vercel จัดการ Domain เอง
-          const res = await fetch(`/api/prediction?email=${encodeURIComponent(email)}&mode=getName`);
+          // ดึงชื่อจริงจาก Database มาทับชื่อใน LocalStorage (ถ้ามี)
+          const res = await fetch(`/api/prediction?email=${encodeURIComponent(savedEmail)}&mode=getName`);
           if (res.ok) {
             const userData = await res.json();
             if (userData?.user_name) {
@@ -96,7 +101,7 @@ const PredictPage = () => {
     };
 
     initPage();
-  }, []);
+  }, [router]); // เพิ่ม router ใน dependency array
 
   const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value, options, selectedIndex } = e.target;
