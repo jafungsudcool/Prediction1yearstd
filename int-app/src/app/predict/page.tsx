@@ -169,53 +169,67 @@ const PredictPage = () => {
   ];
 
   const saveAndRedirect = async () => {
-    const finalEmail = user.email || localStorage.getItem("email") || "";
-    // ดึงรหัสออกมาจาก email
-    const studentIdOnly = finalEmail.split('@')[0];
+    // 1. ดึงข้อมูลสดจาก LocalStorage (ป้องกัน State ใน React หายบน Production)
+    const storageEmail = localStorage.getItem("email") || "";
+    const storageName = localStorage.getItem("name") || "";
     
-    const finalName = dbName || user.name || localStorage.getItem("name") || studentIdOnly || "ผู้ใช้งาน";
+    // 2. เตรียมค่า Email และ Student ID (ตัดหน้า @)
+    const finalEmail = storageEmail || user.email;
+    const studentIdOnly = finalEmail ? finalEmail.split('@')[0] : "";
+    
+    // 3. เตรียมชื่อที่จะแสดงผล (ลำดับ: จาก DB > จาก LocalStorage > จากรหัส > ผู้ใช้งาน)
+    const finalName = dbName || storageName || user.name || studentIdOnly || "ผู้ใช้งาน";
 
-    // ตรวจสอบความพร้อมของข้อมูล (ป้องกัน Payload ว่าง)
-    if (!predictionResult || !finalEmail || !studentIdOnly) {
-      alert("ข้อมูลไม่ครบถ้วน กรุณาลองใหม่อีกครั้ง");
+    // 4. ตรวจสอบความพร้อมก่อนส่ง (หัวใจสำคัญ: ป้องกัน Payload ว่าง)
+    if (!predictionResult || !predictionResult.code) {
+      alert("ไม่พบผลการพยากรณ์ กรุณากดปุ่มวิเคราะห์ใหม่อีกครั้ง");
       return;
     }
 
-    // สร้างสรุปคำตอบ (ใช้ label ที่เก็บไว้ใน formData)
+    if (!finalEmail || !studentIdOnly) {
+      alert("ไม่พบข้อมูลผู้ใช้งาน (Email) กรุณาทำการ Login ใหม่อีกครั้ง");
+      return;
+    }
+
+    // 5. รวบรวมคำตอบจาก formData (ใช้ label ที่เราเก็บไว้ตอน handleInputChange)
     const summaryAnswer = questionsData.map((q, idx) => {
-      const labelText = formData[`${q.id}_label`] || formData[q.id] || "ไม่ได้ตอบ";
-      return `${idx + 1}. ${q.label}: ${labelText}`;
+      const answerLabel = formData[`${q.id}_label`] || formData[q.id] || "ไม่ได้ตอบ";
+      return `${idx + 1}. ${q.label}: ${answerLabel}`;
     }).join(" | ");
 
+    // 6. สร้าง Payload สำหรับส่งไป API (ตรงตามโครงสร้าง Prisma)
     const payload = {
       email: finalEmail,
-      student_id: studentIdOnly, // ส่งรหัสที่ตัดแล้วไปที่ API
+      student_id: studentIdOnly,
       name: finalName,
       answer: summaryAnswer,
-      result: predictionResult.code,
+      result: predictionResult.code, // จะเป็น 'CS' หรือ 'IT'
       mode: "savePrediction"
     };
 
-    console.log("Sending Payload to Vercel:", payload); // ตรวจสอบก่อนส่งจริง
+    console.log("Preparing to send payload:", payload); // ดูใน Console ว่าค่าครบไหม
 
     try {
       const response = await fetch("/api/prediction", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json; charset=utf-8" 
+        },
         body: JSON.stringify(payload),
       });
 
       if (response.ok) {
+        // เมื่อบันทึกสำเร็จ ให้ปิด Modal และย้ายหน้า
         setIsModalOpen(false);
-        // เคลียร์ค่าก่อนไปหน้าประวัติ
         router.push("/historyuser"); 
       } else {
         const err = await response.json();
-        alert(`บันทึกไม่สำเร็จ: ${err.error || "Server Error"}`);
+        console.error("Server Error Details:", err);
+        alert(`บันทึกไม่สำเร็จ: ${err.error || "เกิดข้อผิดพลาดภายในระบบ"}`);
       }
     } catch (error) {
-      console.error("Network error:", error);
-      alert("ไม่สามารถติดต่อ Database ได้ในขณะนี้");
+      console.error("Network Error:", error);
+      alert("ไม่สามารถติดต่อเซิร์ฟเวอร์ได้ กรุณาตรวจสอบอินเทอร์เน็ตของคุณ");
     }
   };
 
