@@ -83,32 +83,43 @@ const PredictPage = () => {
   const calculateResult = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // ตรวจสอบว่ากรอกครบทุกข้อไหมก่อนคำนวณ
     const requiredKeys = ['q1', 'q2', 'q3', 'q4', 'q5'];
-    const isComplete = requiredKeys.every(key => formData[key]);
+    // ตรวจสอบข้อมูลดิบใน formData
+    const isComplete = requiredKeys.every(key => formData[key] && formData[key] !== "");
     
     if (!isComplete) {
       alert("กรุณาตอบคำถามให้ครบทุกข้อ");
       return;
     }
 
-    const inputVector = [
-      gradeMap[formData.q1],
-      gradeMap[formData.q2],
-      formData.q3 === "yes" ? 1 : 0,
-      understandMap[formData.q4],
-      jobMap[formData.q5],
-    ];
+    // แปลงค่าจาก Map (ต้องมั่นใจว่า key ใน map ตรงกับ value ใน select)
+    const v1 = gradeMap[formData.q1];
+    const v2 = gradeMap[formData.q2];
+    const v3 = formData.q3 === "yes" ? 1 : 0;
+    const v4 = understandMap[formData.q4];
+    const v5 = jobMap[formData.q5];
 
-    const k = 5;
+    // เช็คว่ามีค่าไหนเป็น NaN หรือไม่ (กรณี Map หา key ไม่เจอ)
+    if ([v1, v2, v4, v5].some(v => v === undefined)) {
+        console.error("Mapping error:", {v1, v2, v4, v5});
+        alert("เกิดข้อผิดพลาดในการประมวลผลข้อมูล กรุณาเลือกคำตอบใหม่อีกครั้ง");
+        return;
+    }
+
+    const inputVector = [v1, v2, v3, v4, v5];
+
+    const k = 3; // ปรับ k เป็นเลขคี่ (3 หรือ 5) เพื่อลดโอกาสเสมอ
     const neighbors = trainData
       .map(d => ({ label: d.label, dist: distance(d.x, inputVector) }))
       .sort((a, b) => a.dist - b.dist)
       .slice(0, k);
 
-    const vote = { CS: 0, IT: 0 };
-    neighbors.forEach(n => vote[n.label as "CS" | "IT"]++);
-    const calculatedResult: "CS" | "IT" = vote.CS >= vote.IT ? "CS" : "IT";
+    const vote: Record<string, number> = { CS: 0, IT: 0 };
+    neighbors.forEach(n => {
+        vote[n.label]++;
+    });
+    
+    const calculatedResult: 'CS' | 'IT' = vote.CS > vote.IT ? "CS" : "IT";
 
     setPredictionResult({
       type: dbName || user.name || localStorage.getItem("name") || "ผู้ใช้งาน",
@@ -127,51 +138,53 @@ const PredictPage = () => {
   ];
 
   const saveAndRedirect = async () => {
-    // ดึงค่าสดๆ จาก LocalStorage เสมอ เพื่อกันเหนียวบน Production
-    const finalEmail = user.email || localStorage.getItem("email");
-    const finalName = dbName || user.name || localStorage.getItem("name") || (finalEmail ? finalEmail.split('@')[0] : "ผู้ใช้งาน");
+    const finalEmail = user.email || localStorage.getItem("email") || "";
+    // ดึงรหัสออกมาจาก email
+    const studentIdOnly = finalEmail.split('@')[0];
+    
+    const finalName = dbName || user.name || localStorage.getItem("name") || studentIdOnly || "ผู้ใช้งาน";
 
-    if (!predictionResult || !finalEmail) {
-      console.error("Data missing:", { predictionResult, finalEmail });
+    // ตรวจสอบความพร้อมของข้อมูล (ป้องกัน Payload ว่าง)
+    if (!predictionResult || !finalEmail || !studentIdOnly) {
       alert("ข้อมูลไม่ครบถ้วน กรุณาลองใหม่อีกครั้ง");
       return;
     }
 
+    // สร้างสรุปคำตอบ (ใช้ label ที่เก็บไว้ใน formData)
     const summaryAnswer = questionsData.map((q, idx) => {
-      return `${idx + 1}. ${q.label}: ${formData[`${q.id}_label`] || "ไม่ได้ตอบ"}`;
+      const labelText = formData[`${q.id}_label`] || formData[q.id] || "ไม่ได้ตอบ";
+      return `${idx + 1}. ${q.label}: ${labelText}`;
     }).join(" | ");
 
     const payload = {
       email: finalEmail,
+      student_id: studentIdOnly, // ส่งรหัสที่ตัดแล้วไปที่ API
       name: finalName,
       answer: summaryAnswer,
       result: predictionResult.code,
       mode: "savePrediction"
     };
 
+    console.log("Sending Payload to Vercel:", payload); // ตรวจสอบก่อนส่งจริง
+
     try {
-      // ใช้ relative path และเพิ่ม cache: 'no-store' เพื่อป้องกันการค้างของ Vercel
       const response = await fetch("/api/prediction", {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-        cache: 'no-store'
       });
 
       if (response.ok) {
         setIsModalOpen(false);
-        // ใช้ router.push จะทำงานได้ลื่นไหลกว่าบน Next.js
+        // เคลียร์ค่าก่อนไปหน้าประวัติ
         router.push("/historyuser"); 
       } else {
         const err = await response.json();
-        console.error("Save failed:", err);
-        alert(`บันทึกไม่สำเร็จ: ${err.error || "เกิดข้อผิดพลาดที่ Server"}`);
+        alert(`บันทึกไม่สำเร็จ: ${err.error || "Server Error"}`);
       }
     } catch (error) {
       console.error("Network error:", error);
-      alert("ไม่สามารถติดต่อ Server ได้ กรุณาเช็กการเชื่อมต่ออินเทอร์เน็ต");
+      alert("ไม่สามารถติดต่อ Database ได้ในขณะนี้");
     }
   };
 
