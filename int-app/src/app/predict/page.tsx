@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import MainLayout from "@/components/MainLayout";
 import { useRouter } from 'next/navigation';
-import { BrainCircuit } from "lucide-react";
+import { BrainCircuit, ChevronDown } from "lucide-react";
 
 // ================= KNN CONFIG (คงเดิม) =================
 const trainData = [
@@ -247,22 +247,28 @@ const PredictPage = () => {
 };
 
 const Question = ({ id, label, options, onChange }: any) => (
-  <div className="space-y-3 group">
-    <label className="block text-md font-bold text-slate-700 group-focus-within:text-blue-600 transition-colors">
+  <div className="space-y-1 group"> {/* บีบระยะห่างข้อให้ชิดขึ้น */}
+    <label className="block text-xs font-bold text-slate-500 group-focus-within:text-blue-500 transition-colors uppercase">
       {label}
     </label>
-    <select 
-      id={id} 
-      name={id} 
-      required 
-      onChange={onChange} 
-      className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-400 focus:bg-white transition-all appearance-none cursor-pointer font-medium text-slate-600"
-    >
-      <option value="">เลือกคำตอบ...</option>
-      {options.map((opt: any, i: number) => (
-        <option key={i} value={opt.value}>{opt.label}</option>
-      ))}
-    </select>
+    <div className="relative">
+      <select 
+        id={id} 
+        name={id} 
+        required 
+        onChange={onChange} 
+        // ปรับ py-2 (ความสูง) และ text-[12px] (ขนาดอักษร) ให้เล็กจิ๋ว
+        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-blue-400 focus:bg-white transition-all appearance-none cursor-pointer text-[12px] font-medium text-slate-600 shadow-sm"
+      >
+        <option value="">เลือกคำตอบ...</option>
+        {options.map((opt: any, i: number) => (
+          <option key={i} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
+      <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+        <ChevronDown size={14} />
+      </div>
+    </div>
   </div>
 );
 
