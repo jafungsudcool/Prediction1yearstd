@@ -17,11 +17,18 @@ export default function LoginPage() {
       return;
     }
 
-    await signIn("credentials", {
+    const result = await signIn("credentials", {
       email,
-      callbackUrl: "/user", 
-      redirect: true,
+      redirect: false, // ปิดการ redirect อัตโนมัติของ NextAuth
     });
+
+    if (result?.ok) {
+      // ใช้ window.location.href แทน router.push ในจังหวะนี้ 
+      window.location.href = "/"; 
+    } else {
+      // จัดการ Error เช่น แสดง Alert ว่าอีเมลหรือรหัสผ่านผิด
+      console.error(result?.error);
+    }
   };
   
   return (
@@ -33,7 +40,7 @@ export default function LoginPage() {
         <div className="w-full lg:w-1/2 p-8 md:p-12 lg:p-16 flex flex-col justify-center bg-white">
           <div className="max-w-md mx-auto w-full">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">             
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">             
                  Welcome to Prediction Curriculum! </h1>
     
               <p className="text-gray-500"> กรุณาเข้าสู่ระบบด้วยอีเมลมหาวิทยาลัย</p>

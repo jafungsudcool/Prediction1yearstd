@@ -39,7 +39,6 @@ export const authOptions: NextAuthOptions = {
         const userEmail = credentials.email.toLowerCase().trim();
         const adminEmails = [
           "655021000014@mail.rmutk.ac.th", 
-      //   "655021000659@mail.rmutk.ac.th", 
         ].map(email => email.toLowerCase().trim());
 
         const role = adminEmails.includes(userEmail) ? "admin" : "user";
@@ -53,33 +52,32 @@ export const authOptions: NextAuthOptions = {
   ],
 
 callbacks: {
-  async jwt({ token, user, account }) {
-    // ถ้าเป็นการ Login ครั้งแรก
+  async jwt({ token, user }) {
     if (user) {
-      const adminEmails = [
-        "655021000014@mail.rmutk.ac.th", 
-       // "655021000659@mail.rmutk.ac.th"
-      ];
-      // ตรวจสอบทั้งกรณี Credentials และ Google
+      const adminEmails = ["655021000014@mail.rmutk.ac.th"];
       token.role = adminEmails.includes(user.email ?? "") ? "admin" : "user";
     }
     return token;
   },
   async session({ session, token }) {
-    console.log("Token in session callback:", token); // เช็คว่าใน token มี role ไหม
     if (session.user) {
       session.user.role = token.role;
     }
     return session;
   },
 
-    async redirect({ url, baseUrl }) {
-      // ถ้า url คือหน้าแรก ให้ส่งไปที่หน้าหลักของ user/admin
-      if (url === baseUrl || url === `${baseUrl}/`) {
-        return `${baseUrl}/user`; 
-      }
-      return url.startsWith(baseUrl) ? url : baseUrl;
-    },
+async redirect({ url, baseUrl }) {
+  // ไม่ต้องระบุหน้า /dashboard หรือ /user ที่นี่
+  // ให้ส่งกลับไปที่หน้าแรก (Root) เพื่อให้ Middleware ทำงาน
+  if (url.startsWith("/")) return `${baseUrl}${url}`;
+  else if (new URL(url).origin === baseUrl) return url;
+  
+  return baseUrl; 
+},
+},
+
+  session: {
+    strategy: "jwt",
   },
 
   secret: process.env.NEXTAUTH_SECRET,

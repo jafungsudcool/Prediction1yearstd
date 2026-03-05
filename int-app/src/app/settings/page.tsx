@@ -141,7 +141,7 @@ export default function ManageModelPage() {
         {/* --- Tab Content: Update Model --- */}
         {activeTab === 'model' && (
           <div className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-100 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <h2 className="text-2xl font-black text-slate-800 mb-8 flex items-center gap-3">
+            <h2 className="text-xl font-black text-slate-800 mb-8 flex items-center gap-3">
               <Settings className="text-indigo-500" /> ปรับปรุงข้อมูลพยากรณ์
             </h2>
             
@@ -186,7 +186,7 @@ export default function ManageModelPage() {
               <button
                 type="submit"
                 onClick={handleSaveSettings}
-                className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl shadow-lg shadow-indigo-200 text-lg font-bold transition-all transform hover:scale-[1.02]">
+                className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl shadow-lg shadow-indigo-200 text-md font-bold transition-all transform hover:scale-[1.02]">
                 <Save size={20} /> บันทึกการตั้งค่า
               </button>
             </form>
@@ -200,10 +200,10 @@ export default function ManageModelPage() {
             {/* --- Header & Add Student Button --- */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
               <div>
-                <h2 className="text-2xl font-black text-slate-800 flex items-center gap-3">
+                <h2 className="text-lg font-black text-slate-800 flex items-center gap-3">
                   <Users className="text-indigo-500" /> รายชื่อและโปรไฟล์นักศึกษา
                 </h2>
-                <p className="text-slate-400 text-sm font-bold mt-1 uppercase tracking-tight">Management & Student Profiles</p>
+                <p className="text-slate-400 text-xs font-bold mt-1 uppercase tracking-tight">Management & Student Profiles</p>
               </div>
               
               <button 
@@ -235,20 +235,20 @@ export default function ManageModelPage() {
                         <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-300 border border-slate-100 group-hover:bg-indigo-50 group-hover:text-indigo-400 transition-colors">
                           <UserIcon size={32} />
                         </div>
-                        <span className="absolute -bottom-2 -left-2 bg-indigo-100 text-indigo-600 text-[10px] font-black px-2.5 py-1 rounded-lg border-2 border-white shadow-sm uppercase tracking-tighter">
+                        <span className="absolute -bottom-2 -left-2 bg-indigo-100 text-indigo-600 text-[8px] font-black px-2.5 py-1 rounded-lg border-2 border-white shadow-sm uppercase tracking-tighter">
                           Student
                         </span>
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-extrabold text-slate-800 text-lg truncate mb-1">
+                        <h3 className="font-extrabold text-slate-800 text-md truncate mb-1">
                           {student.user_name || "ไม่ระบุชื่อ"}
                         </h3>
                         <div className="flex items-center gap-2 text-slate-500 mb-2">
                           <Mail size={14} className="shrink-0 text-slate-300" />
                           <span className="text-sm font-medium truncate ">{student.email}</span>
                         </div>
-                        <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest leading-none">ID: {student.student_id}</p>
+                        <p className="text-[8px] font-bold text-slate-300 uppercase tracking-widest leading-none">ID: {student.student_id}</p>
                       </div>
                     </div>
                   </div>

@@ -36,19 +36,19 @@ export default function DashboardPage() {
     { 
       title: "จำนวนเข้าใช้งานทั้งหมด", 
       value: dbData?.totalUsers?.toString() || "0",
-      icon: <Users size={24} />, 
+      icon: <Users size={20} />, 
       color: "bg-blue-500" 
     },
     { 
       title: "แบบสอบถามที่ทำแล้ว", 
       value: dbData?.myTotal || "0",
-      icon: <BarChart3 size={24} />, 
+      icon: <BarChart3 size={20} />, 
       color: "bg-indigo-500" 
     },
     { 
       title: "ค่าเฉลี่ยความแม่นยำ", 
       value: "87%", 
-      icon: <ArrowUpRight size={24} />, 
+      icon: <ArrowUpRight size={20} />, 
       color: "bg-emerald-500" 
     },
   ];
@@ -101,7 +101,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-sm font-bold text-slate-500 uppercase tracking-tight">{stat.title}</p>
-                  <p className="text-3xl font-black text-slate-900">{stat.value}</p>
+                  <p className="text-xl font-black text-slate-900">{stat.value}</p>
                 </div>
               </div>
             ))}
@@ -143,10 +143,10 @@ export default function DashboardPage() {
                 )}
               </div>
             </div>
-
-            {/* กล่องข้อความต้อนรับ/ประกาศ */}
-            <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 p-10 rounded-[2.5rem] text-white relative overflow-hidden shadow-2xl flex flex-col justify-center">
-               <div className="relative z-10">
+      
+      {/* กล่องข้อความต้อนรับ/ประกาศ */}
+               <div className="bg-gradient-to-br from-indigo-500 to-blue-700 p-10 rounded-[2.5rem] text-white relative overflow-hidden shadow-xl shadow-blue-200">
+                  <div className="relative z-10">
                   <h3 className="text-xl font-black mb-4 leading-tight">
                    สรุปสถิติภาพรวมของระบบพยากรณ์การเลือกหลักสูตรสําหรับนักศึกษาชั้นปีที่ 1
                       สาขาวิชาวิทยาการคอมพิวเตอร์

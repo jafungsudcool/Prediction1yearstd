@@ -85,21 +85,21 @@ export default function HistoryUserPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-5 hover:shadow-md transition-all group">
               <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 group-hover:scale-110 transition-transform">
-                <Monitor size={28} />
+                <Monitor size={26} />
               </div>
               <div>
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">เทคโนโลยีสารสนเทศ (IT)</p>
-                <h3 className="text-3xl font-black text-slate-800">{itCount} <span className="text-sm font-medium text-slate-400">ครั้ง</span></h3>
+                <h3 className="text-2xl font-black text-slate-800">{itCount} <span className="text-sm font-medium text-slate-400">ครั้ง</span></h3>
               </div>
             </div>
 
             <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-5 hover:shadow-md transition-all group">
               <div className="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
-                <GraduationCap size={28} />
+                <GraduationCap size={26} />
               </div>
               <div>
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">วิทยาการคอมพิวเตอร์ (CS)</p>
-                <h3 className="text-3xl font-black text-slate-800">{csCount} <span className="text-sm font-medium text-slate-400">ครั้ง</span></h3>
+                <h3 className="text-2xl font-black text-slate-800">{csCount} <span className="text-sm font-medium text-slate-400">ครั้ง</span></h3>
               </div>
             </div>
           </div>
@@ -134,7 +134,7 @@ export default function HistoryUserPage() {
                             onClick={() => setSelectedItem(item)}
                             className="inline-flex items-center gap-2 px-4 py-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all text-xs font-bold border border-slate-100 shadow-sm active:scale-95"
                           >
-                            <Eye size={14} /> ดูคำตอบ
+                            <Eye size={13} /> ดูคำตอบ
                           </button>
                         </td>
                         <td className="px-6 py-5 text-right">

@@ -28,7 +28,7 @@ const PredictPage = () => {
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [user, setUser] = useState({ email: "", name: "", role: "" });
   const [dbName, setDbName] = useState("");
-  const [initialLoading, setInitialLoading] = useState(true); // เพิ่มตัวแปรเช็คโหลดครั้งแรก
+  const [initialLoading, setInitialLoading] = useState(true); 
 
   useEffect(() => {
     const initPage = async () => {
@@ -36,8 +36,8 @@ const PredictPage = () => {
         const email = localStorage.getItem("email") || "";
         const name = localStorage.getItem("name") || "";
 
-        if (!email || !email.endsWith("@mail.rmutk.ac.th")) {
-          // router.push("/login"); 
+        // ปรับเงื่อนไขให้ยืดหยุ่น ถ้าไม่มี email ให้ลองโหลดใหม่หรือไป login
+        if (!email) {
           setInitialLoading(false);
           return;
         }
@@ -48,9 +48,9 @@ const PredictPage = () => {
           role: localStorage.getItem("role") || "user"
         });
 
-        // ดึงชื่อจาก DB ต่อเนื่องกันไปเลย
         try {
-          const res = await fetch(`/api/prediction?email=${email}&mode=getName`);
+          // ใช้ Relative Path เสมอเพื่อให้ Vercel จัดการ Domain เอง
+          const res = await fetch(`/api/prediction?email=${encodeURIComponent(email)}&mode=getName`);
           if (res.ok) {
             const userData = await res.json();
             if (userData?.user_name) {
@@ -65,23 +65,33 @@ const PredictPage = () => {
         }
       }
     };
+
     initPage();
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedIndex = e.target.selectedIndex;
-    const selectedLabel = e.target.options[selectedIndex].text;
-    const selectedValue = e.target.value;
+    const { name, value, options, selectedIndex } = e.target;
+    const selectedLabel = options[selectedIndex].text;
 
-    setFormData({ 
-      ...formData, 
-      [e.target.name]: selectedValue,
-      [`${e.target.name}_label`]: selectedLabel 
-    });
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: value,
+      [`${name}_label`]: selectedLabel 
+    }));
   };  
 
   const calculateResult = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // ตรวจสอบว่ากรอกครบทุกข้อไหมก่อนคำนวณ
+    const requiredKeys = ['q1', 'q2', 'q3', 'q4', 'q5'];
+    const isComplete = requiredKeys.every(key => formData[key]);
+    
+    if (!isComplete) {
+      alert("กรุณาตอบคำถามให้ครบทุกข้อ");
+      return;
+    }
+
     const inputVector = [
       gradeMap[formData.q1],
       gradeMap[formData.q2],
@@ -101,7 +111,7 @@ const PredictPage = () => {
     const calculatedResult: "CS" | "IT" = vote.CS >= vote.IT ? "CS" : "IT";
 
     setPredictionResult({
-      type: user.name || localStorage.getItem("name") || "ผู้ใช้งาน",
+      type: dbName || user.name || localStorage.getItem("name") || "ผู้ใช้งาน",
       code: calculatedResult,
       message: calculatedResult === "CS" ? "คุณเหมาะกับหลักสูตร วิทยาการคอมพิวเตอร์ (CS)" : "คุณเหมาะกับหลักสูตร เทคโนโลยีสารสนเทศ (IT)",
     });
@@ -117,39 +127,54 @@ const PredictPage = () => {
   ];
 
   const saveAndRedirect = async () => {
-    if (predictionResult && user?.email) {
-      const summaryAnswer = questionsData.map((q, idx) => {
-        return `${idx + 1}. ${q.label}: ${formData[`${q.id}_label`] || "ไม่ได้ตอบ"}`;
-      }).join(" | ");
+    // ดึงค่าสดๆ จาก LocalStorage เสมอ เพื่อกันเหนียวบน Production
+    const finalEmail = user.email || localStorage.getItem("email");
+    const finalName = dbName || user.name || localStorage.getItem("name") || (finalEmail ? finalEmail.split('@')[0] : "ผู้ใช้งาน");
 
-      const payload = {
-        email: user.email,
-        name: dbName || user.name || user.email.split('@')[0],
-        answer: summaryAnswer,
-        result: predictionResult.code // ส่ง 'CS' หรือ 'IT'
-      };
+    if (!predictionResult || !finalEmail) {
+      console.error("Data missing:", { predictionResult, finalEmail });
+      alert("ข้อมูลไม่ครบถ้วน กรุณาลองใหม่อีกครั้ง");
+      return;
+    }
 
-      try {
-        const response = await fetch("/api/prediction", {
-          method: "POST",
-          headers: { "Content-Type": "application/json; charset=utf-8" },
-          body: JSON.stringify(payload),
-        });
+    const summaryAnswer = questionsData.map((q, idx) => {
+      return `${idx + 1}. ${q.label}: ${formData[`${q.id}_label`] || "ไม่ได้ตอบ"}`;
+    }).join(" | ");
 
-        if (response.ok) {
-          setIsModalOpen(false);
-          window.location.href = "/historyuser"; 
-        } else {
-          const err = await response.json();
-          alert(`บันทึกไม่สำเร็จ: ${err.details || err.error}`);
-        }
-      } catch (error) {
-        alert("การเชื่อมต่อล้มเหลว");
+    const payload = {
+      email: finalEmail,
+      name: finalName,
+      answer: summaryAnswer,
+      result: predictionResult.code,
+      mode: "savePrediction"
+    };
+
+    try {
+      // ใช้ relative path และเพิ่ม cache: 'no-store' เพื่อป้องกันการค้างของ Vercel
+      const response = await fetch("/api/prediction", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload),
+        cache: 'no-store'
+      });
+
+      if (response.ok) {
+        setIsModalOpen(false);
+        // ใช้ router.push จะทำงานได้ลื่นไหลกว่าบน Next.js
+        router.push("/historyuser"); 
+      } else {
+        const err = await response.json();
+        console.error("Save failed:", err);
+        alert(`บันทึกไม่สำเร็จ: ${err.error || "เกิดข้อผิดพลาดที่ Server"}`);
       }
+    } catch (error) {
+      console.error("Network error:", error);
+      alert("ไม่สามารถติดต่อ Server ได้ กรุณาเช็กการเชื่อมต่ออินเทอร์เน็ต");
     }
   };
 
-  // --- ส่วน Skeleton Loading ---
   const SkeletonForm = () => (
     <div className="space-y-8 animate-pulse">
       {[1, 2, 3, 4, 5].map((i) => (
@@ -169,9 +194,6 @@ const PredictPage = () => {
           <SkeletonForm />
         ) : (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex items-center gap-3 mb-8 pb-6 border-b border-slate-50">
-            </div>
-
             <form onSubmit={calculateResult} className="space-y-8">
               <div className="space-y-6">
                 {questionsData.map((q) => (
@@ -203,7 +225,7 @@ const PredictPage = () => {
             <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner">
                 <BrainCircuit size={40} />
             </div>
-            <h2 className="text-2xl font-black text-slate-800 text-center mb-2">
+            <h2 className="text-xl font-black text-slate-800 text-center mb-2">
                วิเคราะห์ผลสำเร็จ
             </h2>            
             <p className="text-slate-500 text-center text-md mb-8 px-4 leading-relaxed">
@@ -216,7 +238,6 @@ const PredictPage = () => {
                 >
                     บันทึกข้อมูลและดูประวัติ
                 </button>
-               
             </div>
           </div>
         </div>

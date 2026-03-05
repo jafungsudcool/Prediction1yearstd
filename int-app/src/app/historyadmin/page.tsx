@@ -77,7 +77,7 @@ export default function HistoryAdminPage() {
           <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
             <Filter size={20} />
           </div>
-          <h3 className="text-lg font-bold text-slate-800">ค้นหาและกรองข้อมูลนักศึกษา</h3>
+          <h3 className="text-md font-bold text-slate-800">ค้นหาและกรองข้อมูลนักศึกษา</h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
