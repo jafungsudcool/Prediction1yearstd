@@ -96,19 +96,24 @@ export async function GET(req: Request) {
       return NextResponse.json(user);
     }
 
-    if (mode === "getUserDashboard" && email) {
+      if (mode === "getUserDashboard" && email) {
       const studentId = email.split('@')[0];
       const [myTotal, myRecent, totalUsers] = await Promise.all([
-        prisma.curriculum_selection.count({ where: { student_id: studentId } }),
+        prisma.curriculum_selection.count({ 
+          where: { student_id: studentId } 
+        }),
         prisma.curriculum_selection.findMany({ 
           where: { student_id: studentId }, 
           take: 3, 
           orderBy: { prediction_date: 'desc' } 
         }),
-        prisma.user.count()
+        prisma.user.count({ 
+          where: { role: "user" } 
+        })
       ]);
-      return NextResponse.json({ myTotal, myRecent, totalUsers });
-    }
+
+  return NextResponse.json({ myTotal, myRecent, totalUsers });
+}
 
     if (mode === "getAdminDashboard") {
       const [totalUsers, totalPredictions, recentActivities, csCount, itCount] = await Promise.all([
