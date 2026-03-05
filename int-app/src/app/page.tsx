@@ -23,11 +23,14 @@ export default function LoginPage() {
     });
 
     if (result?.ok) {
+      localStorage.setItem("email", email);
+    //  localStorage.setItem("name", user_name || "Unknown");
       // ใช้ window.location.href แทน router.push ในจังหวะนี้ 
       window.location.href = "/"; 
     } else {
       // จัดการ Error เช่น แสดง Alert ว่าอีเมลหรือรหัสผ่านผิด
       console.error(result?.error);
+      alert("เข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบอีเมล");
     }
   };
   

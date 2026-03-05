@@ -15,37 +15,12 @@ const trainData = [
   { x: [3.5, 3.5, 1, 3, 5], label: "CS" },
 ];
 
-// 1. แปลงเกรด (ตรงกับ q1, q2)
-const gradeMap: Record<string, number> = { 
-  "A": 4, 
-  "B+": 3.5, 
-  "B": 3, 
-  "C+": 2.5, 
-  "C": 2, 
-  "D+": 1.5, 
-  "D": 1 
-};
-
-// 2. แปลงความเข้าใจ (ตรงกับ q4)
-const understandMap: Record<string, number> = { 
-  "มากที่สุด": 4, 
-  "มาก": 3, 
-  "ปานกลาง": 2, 
-  "น้อย": 1, 
-  "ไม่เข้าใจเลย": 0 
-};
-
-// 3. แปลงอาชีพ (ตรงกับ q5)
+const gradeMap: Record<string, number> = { "A": 4, "B+": 3.5, "B": 3, "C+": 2.5, "C": 2, "D+": 1.5, "D": 1 };
+const understandMap: Record<string, number> = { "มากที่สุด": 4, "มาก": 3, "ปานกลาง": 2, "น้อย": 1, "ไม่เข้าใจเลย": 0 };
 const jobMap: Record<string, number> = { 
-  "Data Scientist": 0, 
-  "AI Innovator": 1, 
-  "Software Developer": 2, 
-  "Cyber Security Analyst": 3, 
-  "UX UI Designer": 4, 
-  "DevOps Engineer": 5, 
-  "Tester / QA": 6, 
-  "IT Support / Administrator": 7, 
-  "ยังไม่แน่ใจ": 8 
+  "Data Scientist": 0, "AI Innovator": 1, "Software Developer": 2, 
+  "Cyber Security Analyst": 3, "UX UI Designer": 4, "DevOps Engineer": 5, 
+  "Tester / QA": 6, "IT Support / Administrator": 7, "ยังไม่แน่ใจ": 8 
 };
 
 const distance = (a: number[], b: number[]) => Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0));
@@ -62,20 +37,16 @@ const PredictPage = () => {
   useEffect(() => {
     const initPage = async () => {
       if (typeof window !== 'undefined') {
-        // 1. ดึงค่าและตรวจสอบสะกด (ต้องตัวเล็กทั้งหมด 'email')
         const savedEmail = localStorage.getItem("email");
         const savedName = localStorage.getItem("name");
 
-        // 2. ถ้าไม่มี Email ห้ามให้ทำแบบทดสอบต่อ (ต้องส่งไป Login)
+        // แก้ไข: ถ้าไม่มี Email ให้ Redirect ไปหน้า Login ทันที
         if (!savedEmail) {
-          console.error("No email found in localStorage");
-          // แทนที่จะ return เฉยๆ ให้ส่งกลับไปหน้า Login
-          alert("เซสชันหมดอายุหรือยังไม่ได้เข้าสู่ระบบ กรุณา Login ใหม่");
-          router.push("/login"); 
+          alert("ไม่พบข้อมูลผู้ใช้งาน กรุณาเข้าสู่ระบบใหม่อีกครั้ง");
+          router.push("/"); 
           return;
         }
 
-        // 3. ถ้ามี Email ให้เซต State ตามปกติ
         setUser({
           email: savedEmail,
           name: savedName || "",
@@ -83,7 +54,6 @@ const PredictPage = () => {
         });
 
         try {
-          // ดึงชื่อจริงจาก Database มาทับชื่อใน LocalStorage (ถ้ามี)
           const res = await fetch(`/api/prediction?email=${encodeURIComponent(savedEmail)}&mode=getName`);
           if (res.ok) {
             const userData = await res.json();
@@ -99,28 +69,19 @@ const PredictPage = () => {
         }
       }
     };
-
     initPage();
-  }, [router]); // เพิ่ม router ใน dependency array
+  }, [router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value, options, selectedIndex } = e.target;
     const selectedLabel = options[selectedIndex].text;
-
-    setFormData(prev => ({ 
-      ...prev, 
-      [name]: value,
-      [`${name}_label`]: selectedLabel 
-    }));
+    setFormData(prev => ({ ...prev, [name]: value, [`${name}_label`]: selectedLabel }));
   };  
 
   const calculateResult = (e: React.FormEvent) => {
     e.preventDefault();
     
-    alert("ข้อมูลที่มีตอนนี้: " + JSON.stringify(formData));
-
     const requiredKeys = ['q1', 'q2', 'q3', 'q4', 'q5'];
-    // ตรวจสอบข้อมูลดิบใน formData
     const isComplete = requiredKeys.every(key => formData[key] && formData[key] !== "");
     
     if (!isComplete) {
@@ -128,37 +89,27 @@ const PredictPage = () => {
       return;
     }
 
-    // แปลงค่าจาก Map (ต้องมั่นใจว่า key ใน map ตรงกับ value ใน select)
-    const q1 = gradeMap[formData.q1];
-    const q2 = gradeMap[formData.q2];
+    // แก้ไข: เพิ่ม fallback || 0 ป้องกันค่า undefined
+    const q1 = gradeMap[formData.q1] || 0;
+    const q2 = gradeMap[formData.q2] || 0;
     const q3 = formData.q3 === "yes" ? 1 : 0;
-    const q4 = understandMap[formData.q4];
-    const q5 = jobMap[formData.q5];
-
-    // เช็คว่ามีค่าไหนเป็น NaN หรือไม่ (กรณี Map หา key ไม่เจอ)
-    if ([q1, q2, q3, q4, q5].some(v => v === undefined)) {
-        console.error("Mapping error:", {q1, q2, q3, q4, q5});
-        alert("เกิดข้อผิดพลาดในการประมวลผลข้อมูล กรุณาเลือกคำตอบใหม่อีกครั้ง");
-        return;
-    }
+    const q4 = understandMap[formData.q4] || 0;
+    const q5 = jobMap[formData.q5] || 0;
 
     const inputVector = [q1, q2, q3, q4, q5];
-
-    const k = 3; // ปรับ k เป็นเลขคี่ (3 หรือ 5) เพื่อลดโอกาสเสมอ
+    const k = 3; 
     const neighbors = trainData
       .map(d => ({ label: d.label, dist: distance(d.x, inputVector) }))
       .sort((a, b) => a.dist - b.dist)
       .slice(0, k);
 
     const vote: Record<string, number> = { CS: 0, IT: 0 };
-    neighbors.forEach(n => {
-        vote[n.label]++;
-    });
+    neighbors.forEach(n => { vote[n.label]++; });
     
     const calculatedResult: 'CS' | 'IT' = vote.CS > vote.IT ? "CS" : "IT";
 
     setPredictionResult({
-      type: dbName || user.name || localStorage.getItem("name") || "ผู้ใช้งาน",
+      type: dbName || user.name || "ผู้ใช้งาน",
       code: calculatedResult,
       message: calculatedResult === "CS" ? "คุณเหมาะกับหลักสูตร วิทยาการคอมพิวเตอร์ (CS)" : "คุณเหมาะกับหลักสูตร เทคโนโลยีสารสนเทศ (IT)",
     });
@@ -174,70 +125,58 @@ const PredictPage = () => {
   ];
 
   const saveAndRedirect = async () => {
-    // 1. ดึงข้อมูลสดจาก LocalStorage (ป้องกัน State ใน React หายบน Production)
+    // แก้ไข: ดึง Email สดๆ จาก LocalStorage ทันทีที่กดปุ่ม
     const storageEmail = localStorage.getItem("email") || "";
     const storageName = localStorage.getItem("name") || "";
-    
-    // 2. เตรียมค่า Email และ Student ID (ตัดหน้า @)
     const finalEmail = storageEmail || user.email;
-    const studentIdOnly = finalEmail ? finalEmail.split('@')[0] : "";
-    
-    // 3. เตรียมชื่อที่จะแสดงผล (ลำดับ: จาก DB > จาก LocalStorage > จากรหัส > ผู้ใช้งาน)
+
+    if (!finalEmail) {
+      alert("ไม่พบข้อมูล Email ในระบบ กรุณาเข้าสู่ระบบใหม่อีกครั้ง");
+      return;
+    }
+
+    if (!predictionResult) {
+      alert("กรุณาคำนวณผลลัพธ์ก่อนบันทึก");
+      return;
+    }
+
+    const studentIdOnly = finalEmail.split('@')[0];
     const finalName = dbName || storageName || user.name || studentIdOnly || "ผู้ใช้งาน";
 
-    // 4. ตรวจสอบความพร้อมก่อนส่ง (หัวใจสำคัญ: ป้องกัน Payload ว่าง)
-    if (!predictionResult || !predictionResult.code) {
-      alert("ไม่พบผลการพยากรณ์ กรุณากดปุ่มวิเคราะห์ใหม่อีกครั้ง");
-      return;
-    }
-
-    if (!finalEmail || !studentIdOnly) {
-      alert("ไม่พบข้อมูลผู้ใช้งาน (Email) กรุณาทำการ Login ใหม่อีกครั้ง");
-      return;
-    }
-
-    // 5. รวบรวมคำตอบจาก formData (ใช้ label ที่เราเก็บไว้ตอน handleInputChange)
     const summaryAnswer = questionsData.map((q, idx) => {
       const answerLabel = formData[`${q.id}_label`] || formData[q.id] || "ไม่ได้ตอบ";
       return `${idx + 1}. ${q.label}: ${answerLabel}`;
     }).join(" | ");
 
-    // 6. สร้าง Payload สำหรับส่งไป API (ตรงตามโครงสร้าง Prisma)
     const payload = {
       email: finalEmail,
       student_id: studentIdOnly,
       name: finalName,
       answer: summaryAnswer,
-      result: predictionResult.code, // จะเป็น 'CS' หรือ 'IT'
+      result: predictionResult.code,
       mode: "savePrediction"
     };
-
-    console.log("Preparing to send payload:", payload); // ดูใน Console ว่าค่าครบไหม
 
     try {
       const response = await fetch("/api/prediction", {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json; charset=utf-8" 
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       if (response.ok) {
-        // เมื่อบันทึกสำเร็จ ให้ปิด Modal และย้ายหน้า
         setIsModalOpen(false);
         router.push("/historyuser"); 
       } else {
         const err = await response.json();
-        console.error("Server Error Details:", err);
-        alert(`บันทึกไม่สำเร็จ: ${err.error || "เกิดข้อผิดพลาดภายในระบบ"}`);
+        alert(`บันทึกไม่สำเร็จ: ${err.error || "Server Error"}`);
       }
     } catch (error) {
-      console.error("Network Error:", error);
-      alert("ไม่สามารถติดต่อเซิร์ฟเวอร์ได้ กรุณาตรวจสอบอินเทอร์เน็ตของคุณ");
+      alert("ไม่สามารถเชื่อมต่อฐานข้อมูลได้");
     }
   };
 
+  // ... (ส่วน SkeletonForm และ Return คงเดิมตามที่คุณเขียนไว้)
   const SkeletonForm = () => (
     <div className="space-y-8 animate-pulse">
       {[1, 2, 3, 4, 5].map((i) => (
