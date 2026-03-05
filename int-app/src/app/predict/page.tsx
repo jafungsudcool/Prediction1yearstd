@@ -208,7 +208,7 @@ const PredictPage = () => {
               </div>
               <button 
                 type="submit" 
-                className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-lg font-bold shadow-lg shadow-blue-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-md font-bold shadow-lg shadow-blue-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
               >
                 วิเคราะห์ผลลัพธ์
               </button>
@@ -223,9 +223,9 @@ const PredictPage = () => {
           <div className="bg-white rounded-[2.5rem] p-10 max-w-md w-full shadow-2xl animate-in zoom-in duration-300"
             onClick={(e) => e.stopPropagation()}>
             <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner">
-                <BrainCircuit size={40} />
+                <BrainCircuit size={35} />
             </div>
-            <h2 className="text-xl font-black text-slate-800 text-center mb-2">
+            <h2 className="text-lg font-black text-slate-800 text-center mb-2">
                วิเคราะห์ผลสำเร็จ
             </h2>            
             <p className="text-slate-500 text-center text-md mb-8 px-4 leading-relaxed">

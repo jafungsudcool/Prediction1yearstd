@@ -85,7 +85,7 @@ export default function HistoryUserPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-5 hover:shadow-md transition-all group">
               <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 group-hover:scale-110 transition-transform">
-                <Monitor size={26} />
+                <Monitor size={24} />
               </div>
               <div>
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">เทคโนโลยีสารสนเทศ (IT)</p>
@@ -95,7 +95,7 @@ export default function HistoryUserPage() {
 
             <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex items-center gap-5 hover:shadow-md transition-all group">
               <div className="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
-                <GraduationCap size={26} />
+                <GraduationCap size={24} />
               </div>
               <div>
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">วิทยาการคอมพิวเตอร์ (CS)</p>
