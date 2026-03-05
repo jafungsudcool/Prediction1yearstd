@@ -124,20 +124,20 @@ const PredictPage = () => {
     }
 
     // แปลงค่าจาก Map (ต้องมั่นใจว่า key ใน map ตรงกับ value ใน select)
-    const v1 = gradeMap[formData.q1];
-    const v2 = gradeMap[formData.q2];
-    const v3 = formData.q3 === "yes" ? 1 : 0;
-    const v4 = understandMap[formData.q4];
-    const v5 = jobMap[formData.q5];
+    const q1 = gradeMap[formData.q1];
+    const q2 = gradeMap[formData.q2];
+    const q3 = formData.q3 === "yes" ? 1 : 0;
+    const q4 = understandMap[formData.q4];
+    const q5 = jobMap[formData.q5];
 
     // เช็คว่ามีค่าไหนเป็น NaN หรือไม่ (กรณี Map หา key ไม่เจอ)
-    if ([v1, v2, v4, v5].some(v => v === undefined)) {
-        console.error("Mapping error:", {v1, v2, v4, v5});
+    if ([q1, q2, q3, q4, q5].some(v => v === undefined)) {
+        console.error("Mapping error:", {q1, q2, q3, q4, q5});
         alert("เกิดข้อผิดพลาดในการประมวลผลข้อมูล กรุณาเลือกคำตอบใหม่อีกครั้ง");
         return;
     }
 
-    const inputVector = [v1, v2, v3, v4, v5];
+    const inputVector = [q1, q2, q3, q4, q5];
 
     const k = 3; // ปรับ k เป็นเลขคี่ (3 หรือ 5) เพื่อลดโอกาสเสมอ
     const neighbors = trainData
