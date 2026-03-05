@@ -35,10 +35,10 @@ export default function MainLayout({ children, pageTitle }: MainLayoutProps) {
   }, []);
 
   const menuItems = [
-    { title: "หน้าแรก", icon: <Home size={20} />, href: isAdmin ? "/dashboard" : "/user" },
-    { title: "พยากรณ์", icon: <FileText size={20} />, href: "/predict" , userOnly: true},
-    { title: "ประวัติการพยากรณ์", icon: <History size={20} />, href: isAdmin? "/historyadmin" : "/historyuser" },
-    { title: "การจัดการระบบ", icon: <Menu size={20} />, href: "/settings" , adminOnly: true},
+    { title: "หน้าแรก", icon: <Home size={16} />, href: isAdmin ? "/dashboard" : "/user" },
+    { title: "พยากรณ์", icon: <FileText size={16} />, href: "/predict" , userOnly: true},
+    { title: "ประวัติการพยากรณ์", icon: <History size={16} />, href: isAdmin? "/historyadmin" : "/historyuser" },
+    { title: "การจัดการระบบ", icon: <Menu size={16} />, href: "/settings" , adminOnly: true},
   ];
 
   return (
@@ -75,7 +75,7 @@ export default function MainLayout({ children, pageTitle }: MainLayoutProps) {
                 <Link key={idx} href={item.href} className={`flex items-center justify-between p-3.5 rounded-xl transition-all group ${isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-600'}`}>
                   <div className="flex items-center gap-3">
                     <span className={`${isActive ? '' : 'group-hover:scale-110'} transition-transform`}>{item.icon}</span>
-                    <span className="font-medium text-lg">{item.title}</span>
+                    <span className="font-medium text-md">{item.title}</span>
                   </div>
                   <ChevronRight size={14} className={`${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-all`} />
                 </Link>
@@ -112,7 +112,7 @@ export default function MainLayout({ children, pageTitle }: MainLayoutProps) {
                     <p className="text-sm font-medium text-slate-700 truncate">{session?.user?.email}</p>
                  </div>
                 <button onClick={() => signOut({ callbackUrl: "/" })} className="flex items-center gap-3 p-3 w-full rounded-xl text-red-500 hover:bg-red-50 transition-all font-medium text-sm">
-                  <LogOut size={18} /> ออกจากระบบ
+                  <LogOut size={15} /> ออกจากระบบ
                 </button>
               </div>
             )}
