@@ -83,6 +83,8 @@ const PredictPage = () => {
   const calculateResult = (e: React.FormEvent) => {
     e.preventDefault();
     
+    alert("ข้อมูลที่มีตอนนี้: " + JSON.stringify(formData));
+    
     const requiredKeys = ['q1', 'q2', 'q3', 'q4', 'q5'];
     // ตรวจสอบข้อมูลดิบใน formData
     const isComplete = requiredKeys.every(key => formData[key] && formData[key] !== "");
@@ -271,6 +273,7 @@ const Question = ({ id, label, options, onChange }: any) => (
       onChange={onChange} 
       className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-400 focus:bg-white transition-all appearance-none cursor-pointer font-medium text-slate-600"
     >
+  
       <option value="">เลือกคำตอบ...</option>
       {options.map((opt: any, i: number) => (
         <option key={i} value={opt.value}>{opt.label}</option>
