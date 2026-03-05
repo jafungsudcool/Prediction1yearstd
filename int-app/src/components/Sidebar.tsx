@@ -49,7 +49,7 @@ export default function SidebarWithHeader() {
           className="lg:hidden p-2 text-gray-600"
           onClick={() => setIsSidebarOpen(true)}
         >
-          <Menu size={24} />
+          <Menu size={20} />
         </button>
 
         <div className="hidden lg:block">

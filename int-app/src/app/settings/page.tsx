@@ -130,17 +130,17 @@ export default function ManageModelPage() {
           <button
             onClick={() => setActiveTab('students')}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${
-              activeTab === 'students' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+              activeTab === 'students' ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
-            <Users size={20} />
+            <Users size={18} />
             ข้อมูลนักศึกษา
           </button>
         </div>
 
         {/* --- Tab Content: Update Model --- */}
         {activeTab === 'model' && (
-          <div className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-100 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 animate-in fade-in slide-in-from-bottom-4 duration-300">
             <h2 className="text-xl font-black text-slate-800 mb-8 flex items-center gap-3">
               <Settings className="text-indigo-500" /> ปรับปรุงข้อมูลพยากรณ์
             </h2>
