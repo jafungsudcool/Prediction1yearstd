@@ -15,9 +15,38 @@ const trainData = [
   { x: [3.5, 3.5, 1, 3, 5], label: "CS" },
 ];
 
-const gradeMap: Record<string, number> = { A: 4, "B+": 3.5, B: 3, "C+": 2.5, C: 2, "D+": 1.5, D: 1 };
-const understandMap: Record<string, number> = { มากที่สุด: 4, มาก: 3, ปานกลาง: 2, น้อย: 1, ไม่เข้าใจเลย: 0 };
-const jobMap: Record<string, number> = { "Data Scientist": 0, "AI Innovator": 1, "Software Developer": 2, "Cyber Security Analyst": 3, "UX UI Designer": 4, "DevOps Engineer": 5, "Tester / QA": 6, "IT Support / Administrator": 7, "ยังไม่แน่ใจ": 8 };
+// 1. แปลงเกรด (ตรงกับ q1, q2)
+const gradeMap: Record<string, number> = { 
+  "A": 4, 
+  "B+": 3.5, 
+  "B": 3, 
+  "C+": 2.5, 
+  "C": 2, 
+  "D+": 1.5, 
+  "D": 1 
+};
+
+// 2. แปลงความเข้าใจ (ตรงกับ q4)
+const understandMap: Record<string, number> = { 
+  "มากที่สุด": 4, 
+  "มาก": 3, 
+  "ปานกลาง": 2, 
+  "น้อย": 1, 
+  "ไม่เข้าใจเลย": 0 
+};
+
+// 3. แปลงอาชีพ (ตรงกับ q5)
+const jobMap: Record<string, number> = { 
+  "Data Scientist": 0, 
+  "AI Innovator": 1, 
+  "Software Developer": 2, 
+  "Cyber Security Analyst": 3, 
+  "UX UI Designer": 4, 
+  "DevOps Engineer": 5, 
+  "Tester / QA": 6, 
+  "IT Support / Administrator": 7, 
+  "ยังไม่แน่ใจ": 8 
+};
 
 const distance = (a: number[], b: number[]) => Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0));
 
@@ -84,7 +113,7 @@ const PredictPage = () => {
     e.preventDefault();
     
     alert("ข้อมูลที่มีตอนนี้: " + JSON.stringify(formData));
-    
+
     const requiredKeys = ['q1', 'q2', 'q3', 'q4', 'q5'];
     // ตรวจสอบข้อมูลดิบใน formData
     const isComplete = requiredKeys.every(key => formData[key] && formData[key] !== "");
