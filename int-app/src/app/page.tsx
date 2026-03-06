@@ -6,30 +6,30 @@ import { useState, useEffect } from "react";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-  const { data: session, status } = useSession(); // ดึงข้อมูลจาก Google Auth
+  const { data: session, status } = useSession();
 
-  // --- 1. ตรวจสอบ Session (สำหรับคนที่กด Login ผ่าน Google) ---
   useEffect(() => {
+    // แก้ไข: เพิ่มเงื่อนไขเช็ค pathname เพื่อป้องกันการรีโหลดไม่หยุด
     if (status === "authenticated" && session?.user) {
       const ggEmail = session.user.email || "";
       const ggName = session.user.name || "";
 
-      // เก็บข้อมูลจาก Google ลง LocalStorage ทันที
       localStorage.setItem("email", ggEmail);
       localStorage.setItem("name", ggName);
       
-      // ถ้าเป็น Admin (เช็คจาก Domain หรือ Logic ของคุณ)
-      if (ggEmail === "admin@mail.rmutk.ac.th") { // ตัวอย่างการเช็ค Admin
+      if (ggEmail === "admin@mail.rmutk.ac.th") { 
          localStorage.setItem("role", "admin");
       } else {
          localStorage.setItem("role", "user");
       }
 
-      window.location.href = "/";
+      // ถ้ายืนยันตัวตนแล้วและยังอยู่ที่หน้า Login ให้ย้ายไปหน้า Home ครั้งเดียวพอ
+      if (window.location.pathname.includes("login") || window.location.pathname === "/auth/signin") {
+        window.location.replace("/"); // ใช้ replace เพื่อล้างประวัติการย้อนกลับ
+      }
     }
   }, [status, session]);
 
-  // --- 2. การล็อกอินผ่านอีเมล (Credentials) ---
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
@@ -47,21 +47,18 @@ export default function LoginPage() {
 
     if (result?.ok) {
       try {
-        // ดึงชื่อจาก Database มาซิงค์ (กรณีเคยมีชื่อใน DB แล้ว)
-        const res = await fetch(`/api/prediction?email=${encodeURIComponent(email)}&mode=getName`);
+        const res = await fetch(`/api/prediction?email=${encodeURIComponent(email)}&mode=getName`, { cache: 'no-store' });
         const userData = await res.json();
         
         localStorage.setItem("email", email);
-        
-        // ลำดับความสำคัญชื่อ: 1.จาก DB 2.จาก Google(ถ้ามี) 3.จากเลขหน้าอีเมล
         const displayName = userData?.user_name || session?.user?.name || email.split('@')[0];
         localStorage.setItem("name", displayName);
 
-        window.location.href = "/"; 
+        window.location.replace("/"); 
       } catch (error) {
         console.error("Error during login data sync:", error);
         localStorage.setItem("email", email);
-        window.location.href = "/";
+        window.location.replace("/");
       }
     } else {
       alert("เข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบอีเมล");

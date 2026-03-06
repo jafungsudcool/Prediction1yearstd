@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import MainLayout from "@/components/MainLayout";
 import { useRouter } from 'next/navigation';
-import { useSession } from "next-auth/react"; // ใช้งาน Session
+import { useSession } from "next-auth/react"; 
 import { BrainCircuit } from "lucide-react";
 
 // ================= KNN CONFIG (คงเดิม) =================
@@ -28,7 +28,7 @@ const distance = (a: number[], b: number[]) => Math.sqrt(a.reduce((s, v, i) => s
 
 const PredictPage = () => {
   const router = useRouter();
-  const { data: session, status } = useSession(); // ดึงสถานะการ Login
+  const { data: session, status } = useSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [predictionResult, setPredictionResult] = useState<{ type: string, message: string, code: 'CS' | 'IT' } | null>(null);
   const [formData, setFormData] = useState<Record<string, string>>({});
@@ -38,35 +38,34 @@ const PredictPage = () => {
   
   useEffect(() => {
     const initPage = async () => {
-      // 1. ตรวจสอบสถานะการโหลด Session
       if (status === "loading") return;
 
-      // 2. ถ้าไม่ได้ Login ให้เด้งไปหน้าแรก
       if (status === "unauthenticated") {
         alert("กรุณาเข้าสู่ระบบก่อนใช้งาน");
         router.push("/");
         return;
       }
 
-      // 3. ถ้า Login แล้ว ให้ใช้ข้อมูลจาก Session เป็นหลัก (เสถียรกว่า localStorage)
       if (status === "authenticated" && session?.user?.email) {
         const userEmail = session.user.email;
         const userName = session.user.name || "";
 
-        setUser({
-          email: userEmail,
-          name: userName,
-          role: "user"
-        });
+        // บันทึกใส่ Storage ทันทีเพื่อความชัวร์
+        localStorage.setItem("email", userEmail);
 
-        // ดึงชื่อจริงจาก DB มาอัปเดต UI
         try {
-          const res = await fetch(`/api/prediction?email=${encodeURIComponent(userEmail)}&mode=getName`);
+          const res = await fetch(`/api/prediction?email=${encodeURIComponent(userEmail)}&mode=getName`, { cache: 'no-store' });
           if (res.ok) {
             const userData = await res.json();
-            if (userData?.user_name) {
-              setDbName(userData.user_name);
-            }
+            const finalName = userData?.user_name || userName || userEmail.split('@')[0];
+            setDbName(finalName);
+            localStorage.setItem("name", finalName); // ซิงค์ชื่อลง storage ด้วย
+            
+            setUser({
+              email: userEmail,
+              name: finalName,
+              role: "user"
+            });
           }
         } catch (error) {
           console.error("Error fetching name:", error);
@@ -86,14 +85,9 @@ const PredictPage = () => {
 
   const calculateResult = (e: React.FormEvent) => {
     e.preventDefault();
-    
     const requiredKeys = ['q1', 'q2', 'q3', 'q4', 'q5'];
     const isComplete = requiredKeys.every(key => formData[key] && formData[key] !== "");
-    
-    if (!isComplete) {
-      alert("กรุณาตอบคำถามให้ครบทุกข้อ");
-      return;
-    }
+    if (!isComplete) { alert("กรุณาตอบคำถามให้ครบทุกข้อ"); return; }
 
     const q1 = gradeMap[formData.q1] || 0;
     const q2 = gradeMap[formData.q2] || 0;
@@ -102,15 +96,13 @@ const PredictPage = () => {
     const q5 = jobMap[formData.q5] || 0;
 
     const inputVector = [q1, q2, q3, q4, q5];
-    const k = 3; 
     const neighbors = trainData
       .map(d => ({ label: d.label, dist: distance(d.x, inputVector) }))
       .sort((a, b) => a.dist - b.dist)
-      .slice(0, k);
+      .slice(0, 3);
 
     const vote: Record<string, number> = { CS: 0, IT: 0 };
     neighbors.forEach(n => { vote[n.label]++; });
-    
     const calculatedResult: 'CS' | 'IT' = vote.CS > vote.IT ? "CS" : "IT";
 
     setPredictionResult({
@@ -121,31 +113,20 @@ const PredictPage = () => {
     setIsModalOpen(true);
   };
 
-  const questionsData = [
-    { id: 'q1', label: '1. ผลการเรียนในวิชาระเบียบวิธีการเขียนโปรแกรม (Programming Methodology)', options: [{ label: 'A', value: 'A' }, { label: 'B+', value: 'B+' }, { label: 'B', value: 'B' }, { label: 'C+', value: 'C+' }, { label: 'C', value: 'C' }, { label: 'D+', value: 'D+' }, { label: 'D', value: 'D' }] },
-    { id: 'q2', label: '2. ผลการเรียนในวิชาความน่าจะเป็นสำหรับวิทยาการคอมพิตเตอร์ (Probability for Computer Science)', options: [{ label: 'A', value: 'A' }, { label: 'B+', value: 'B+' }, { label: 'B', value: 'B' }, { label: 'C+', value: 'C+' }, { label: 'C', value: 'C' }, { label: 'D+', value: 'D+' }, { label: 'D', value: 'D' }] },
-    { id: 'q3', label: '3. เคยเรียนเขียนโปรแกรมมาก่อนหรือไม่', options: [{ label: 'ใช่ เคยเรียน', value: 'yes' }, { label: 'ไม่เคยเรียน', value: 'no' }] },
-    { id: 'q4', label: '4. มีความรู้เกี่ยวกับความแตกต่างของหลักสูตร CS และ IT มากแค่ไหน', options: [{ label: 'มากที่สุด', value: 'มากที่สุด' }, { label: 'มาก', value: 'มาก' }, { label: 'ปานกลาง', value: 'ปานกลาง' }, { label: 'น้อย', value: 'น้อย' }, { label: 'ไม่เข้าใจเลย', value: 'ไม่เข้าใจเลย' }] },
-    { id: 'q5', label: '5. คุณสนใจที่จะทำงานในตำแหน่งใด', options: [{ label: "Data Scientist", value: "Data Scientist" }, { label: "AI Innovator", value: "AI Innovator" }, { label: "Software Developer", value: "Software Developer" }, { label: "Cyber Security Analyst", value: "Cyber Security Analyst" }, { label: "UX UI Designer", value: "UX UI Designer" }, { label: "DevOps Engineer", value: "DevOps Engineer" }, { label: "Tester / QA", value: "Tester / QA" }, { label: "IT Support / Administrator", value: "IT Support / Administrator" }, { label: "ยังไม่แน่ใจ", value: "ยังไม่แน่ใจ" }] },
-  ];
-
   const saveAndRedirect = async () => {
-    // ดึง Email จาก Session เป็นที่ตั้ง
-    const finalEmail = session?.user?.email || user.email;
-
-    if (!finalEmail) {
-      alert("ไม่พบข้อมูล Email ในระบบ กรุณาเข้าสู่ระบบใหม่อีกครั้ง");
-      router.push("/");
-      return;
-    }
+    const finalEmail = session?.user?.email || localStorage.getItem("email") || user.email;
+    if (!finalEmail) { alert("ไม่พบข้อมูล Email"); return; }
 
     const studentIdOnly = finalEmail.split('@')[0];
-    const finalName = dbName || user.name || studentIdOnly || "ผู้ใช้งาน";
+    const finalName = dbName || user.name || studentIdOnly;
 
-    const summaryAnswer = questionsData.map((q, idx) => {
-      const answerLabel = formData[`${q.id}_label`] || formData[q.id] || "ไม่ได้ตอบ";
-      return `${idx + 1}. ${q.label}: ${answerLabel}`;
-    }).join(" | ");
+    const summaryAnswer = [
+      `1. Programming: ${formData.q1_label}`,
+      `2. Probability: ${formData.q2_label}`,
+      `3. Previous Experience: ${formData.q3_label}`,
+      `4. Understanding: ${formData.q4_label}`,
+      `5. Job Interest: ${formData.q5_label}`
+    ].join(" | ");
 
     const payload = {
       email: finalEmail,
@@ -164,16 +145,27 @@ const PredictPage = () => {
       });
 
       if (response.ok) {
+        localStorage.setItem("email", finalEmail);
+        localStorage.setItem("name", finalName);
         setIsModalOpen(false);
         router.push("/historyuser"); 
       } else {
         const err = await response.json();
-        alert(`บันทึกไม่สำเร็จ: ${err.error || "Server Error"}`);
+        alert(`บันทึกไม่สำเร็จ: ${err.error}`);
       }
     } catch (error) {
       alert("ไม่สามารถเชื่อมต่อฐานข้อมูลได้");
     }
   };
+
+  // UI rendering...
+  const questionsData = [
+    { id: 'q1', label: '1. ผลการเรียนในวิชาระเบียบวิธีการเขียนโปรแกรม (Programming Methodology)', options: [{ label: 'A', value: 'A' }, { label: 'B+', value: 'B+' }, { label: 'B', value: 'B' }, { label: 'C+', value: 'C+' }, { label: 'C', value: 'C' }, { label: 'D+', value: 'D+' }, { label: 'D', value: 'D' }] },
+    { id: 'q2', label: '2. ผลการเรียนในวิชาความน่าจะเป็นสำหรับวิทยาการคอมพิวเตอร์ (Probability for Computer Science)', options: [{ label: 'A', value: 'A' }, { label: 'B+', value: 'B+' }, { label: 'B', value: 'B' }, { label: 'C+', value: 'C+' }, { label: 'C', value: 'C' }, { label: 'D+', value: 'D+' }, { label: 'D', value: 'D' }] },
+    { id: 'q3', label: '3. เคยเรียนเขียนโปรแกรมมาก่อนหรือไม่', options: [{ label: 'ใช่ เคยเรียน', value: 'yes' }, { label: 'ไม่เคยเรียน', value: 'no' }] },
+    { id: 'q4', label: '4. มีความรู้เกี่ยวกับความแตกต่างของหลักสูตร CS และ IT มากแค่ไหน', options: [{ label: 'มากที่สุด', value: 'มากที่สุด' }, { label: 'มาก', value: 'มาก' }, { label: 'ปานกลาง', value: 'ปานกลาง' }, { label: 'น้อย', value: 'น้อย' }, { label: 'ไม่เข้าใจเลย', value: 'ไม่เข้าใจเลย' }] },
+    { id: 'q5', label: '5. คุณสนใจที่จะทำงานในตำแหน่งใด', options: [{ label: "Data Scientist", value: "Data Scientist" }, { label: "AI Innovator", value: "AI Innovator" }, { label: "Software Developer", value: "Software Developer" }, { label: "Cyber Security Analyst", value: "Cyber Security Analyst" }, { label: "UX UI Designer", value: "UX UI Designer" }, { label: "DevOps Engineer", value: "DevOps Engineer" }, { label: "Tester / QA", value: "Tester / QA" }, { label: "IT Support / Administrator", value: "IT Support / Administrator" }, { label: "ยังไม่แน่ใจ", value: "ยังไม่แน่ใจ" }] },
+  ];
 
   const SkeletonForm = () => (
     <div className="space-y-8 animate-pulse">
@@ -258,7 +250,6 @@ const Question = ({ id, label, options, onChange }: any) => (
       onChange={onChange} 
       className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-400 focus:bg-white transition-all appearance-none cursor-pointer font-medium text-slate-600"
     >
-  
       <option value="">เลือกคำตอบ...</option>
       {options.map((opt: any, i: number) => (
         <option key={i} value={opt.value}>{opt.label}</option>
