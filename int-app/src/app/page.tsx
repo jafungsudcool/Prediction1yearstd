@@ -19,20 +19,35 @@ export default function LoginPage() {
 
     const result = await signIn("credentials", {
       email,
-      redirect: false, // ปิดการ redirect อัตโนมัติของ NextAuth
+      redirect: false, // ปิดการ redirect เพื่อจัดการ localStorage ก่อน
     });
 
     if (result?.ok) {
-      localStorage.setItem("email", email);
-    //  localStorage.setItem("name", user_name || "Unknown");
-      // ใช้ window.location.href แทน router.push ในจังหวะนี้ 
-      window.location.href = "/"; 
+      try {
+        // 1. เรียก API ที่คุณเพิ่งเขียนไปเพื่อดึงชื่อจาก Database
+        const res = await fetch(`/api/prediction?email=${encodeURIComponent(email)}&mode=getName`);
+        const userData = await res.json();
+        
+        // 2. บันทึกข้อมูลลง LocalStorage (จุดที่เคยติดตัวแดง)
+        localStorage.setItem("email", email);
+        
+        // ถ้า userData.user_name มีค่าให้ใช้ชื่อนั้น ถ้าไม่มีให้ใช้ Prefix ของ Email แทน
+        const displayName = userData?.user_name || email.split('@')[0];
+        localStorage.setItem("name", displayName);
+
+        // 3. ย้ายหน้าไปที่ Home
+        window.location.href = "/"; 
+      } catch (error) {
+        console.error("Error during login data sync:", error);
+        // ถึงดึงชื่อไม่ได้ ก็ให้เซ็ต Email พื้นฐานไว้ป้องกัน Error หน้าถัดไป
+        localStorage.setItem("email", email);
+        window.location.href = "/";
+      }
     } else {
-      // จัดการ Error เช่น แสดง Alert ว่าอีเมลหรือรหัสผ่านผิด
-      console.error(result?.error);
       alert("เข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบอีเมล");
     }
   };
+  
   
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 lg:p-8">

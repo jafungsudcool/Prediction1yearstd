@@ -31,43 +31,54 @@ export async function POST(req: Request) {
     }
 
     // 3. ส่วนบันทึกผลการพยากรณ์
-    if (!body.email || !body.result) {
-      return NextResponse.json({ error: "ข้อมูลไม่ครบถ้วน" }, { status: 400 });
+    if (body.mode === "savePrediction") {
+      if (!body.email || !body.result) {
+        return NextResponse.json({ error: "ข้อมูลไม่ครบถ้วน" }, { status: 400 });
+      }
+
+      const studentIdFromEmail = body.email.split('@')[0];
+
+      try {
+        // อัปเดตข้อมูลผู้ใช้ หรือสร้างใหม่ถ้ายังไม่มี (Upsert)
+        await prisma.user.upsert({
+          where: { student_id: studentIdFromEmail },
+          update: {
+            user_name: body.name,
+            email: body.email
+          },
+          create: {
+            student_id: studentIdFromEmail,
+            email: body.email,
+            user_name: body.name,
+            role: "user"
+          }
+        });
+
+        // บันทึกประวัติการพยากรณ์ลงในตาราง curriculum_selection
+        const newRecord = await prisma.curriculum_selection.create({
+          data: {
+            prediction_id: crypto.randomUUID(),
+            student_id: studentIdFromEmail,
+            user_name: body.name,
+            recommended_course: body.result,
+            prediction_date: new Date(),
+            answer: body.answer || ""
+          }
+        });
+
+        return NextResponse.json(newRecord, { status: 201 });
+
+      } catch (err: any) {
+        console.error("Prisma Error:", err);
+        return NextResponse.json({ error: err.message }, { status: 500 });
+      }
     }
+    // --------------------------------------------------
 
-    const studentIdFromEmail = body.email.split('@')[0];
+    return NextResponse.json({ error: "Invalid mode" }, { status: 400 });
 
-    try {
-      // Step A: Upsert User (เพื่อให้แน่ใจว่ามี User อยู่ในระบบ)
-      await prisma.user.upsert({
-        where: { student_id: studentIdFromEmail },
-        update: { user_name: body.name, email: body.email },
-        create: { student_id: studentIdFromEmail, email: body.email, user_name: body.name, role: "user" }
-      });
-
-      // Step B: บันทึกลงตารางการพยากรณ์ (แก้ไขจุดที่ทำให้ Error)
-      const newRecord = await prisma.curriculum_selection.create({
-        data: {
-          prediction_id: Math.random().toString(36).substring(2, 12),
-          student_id: studentIdFromEmail, // ใส่ตรงๆ ตาม Schema
-          user_name: body.name || "Unknown",
-          recommended_course: body.result, 
-          prediction_date: new Date(),
-          answer: typeof body.answer === 'string' ? body.answer : "",       
-         },
-      });
-
-      console.log("บันทึกสำเร็จ:", newRecord.prediction_id);
-      return NextResponse.json(newRecord, { status: 201 });
-
-    } catch (dbError: any) {
-      console.error("Database Error:", dbError.message);
-      return NextResponse.json({ error: "Database Save Failed", details: dbError.message }, { status: 500 });
-    }
-
-  } catch (error: any) {
-    console.error("--- Global POST Error ---", error.message);
-    return NextResponse.json({ error: "Server Error", details: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
@@ -88,13 +99,17 @@ export async function GET(req: Request) {
       return NextResponse.json(students);
     }
 
-    if (mode === "getName" && email) {
-      const user = await prisma.user.findFirst({ 
-        where: { email }, 
-        select: { user_name: true } 
+   if (mode === "getName" && email) {
+    try {
+      const user = await prisma.user.findFirst({
+        where: { email: email },
+        select: { user_name: true }
       });
       return NextResponse.json(user);
+    } catch (error) {
+      return NextResponse.json({ error: "ดึงข้อมูลล้มเหลว" }, { status: 500 });
     }
+  }
 
       if (mode === "getUserDashboard" && email) {
       const studentId = email.split('@')[0];
