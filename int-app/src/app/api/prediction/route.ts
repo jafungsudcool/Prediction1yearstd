@@ -57,12 +57,13 @@ export async function POST(req: Request) {
         // บันทึกประวัติการพยากรณ์ลงในตาราง curriculum_selection
         const newRecord = await prisma.curriculum_selection.create({
           data: {
-            prediction_id: crypto.randomUUID(),
+           prediction_id: Math.random().toString(36).substring(2, 12),
             student_id: studentIdFromEmail,
             user_name: body.name,
             recommended_course: body.result,
             prediction_date: new Date(),
             answer: body.answer || ""
+            
           }
         });
 

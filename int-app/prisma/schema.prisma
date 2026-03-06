@@ -15,8 +15,8 @@ model admin {
 }
 
 model curriculum_selection {
-  prediction_id: Math.random().toString(36).substring(2, 12),
-  student_id         String?        @db.VarChar(12)
+  prediction_id      String         @id @db.VarChar(36)
+  student_id         String?        @db.VarChar(40)
   model_id           String?        @db.VarChar(10)
   recommended_course String?
   prediction_date    DateTime?      @db.Date
