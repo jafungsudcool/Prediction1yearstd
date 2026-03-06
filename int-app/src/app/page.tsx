@@ -1,12 +1,35 @@
 "use client";
 
-import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const { data: session, status } = useSession(); // ดึงข้อมูลจาก Google Auth
 
+  // --- 1. ตรวจสอบ Session (สำหรับคนที่กด Login ผ่าน Google) ---
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      const ggEmail = session.user.email || "";
+      const ggName = session.user.name || "";
+
+      // เก็บข้อมูลจาก Google ลง LocalStorage ทันที
+      localStorage.setItem("email", ggEmail);
+      localStorage.setItem("name", ggName);
+      
+      // ถ้าเป็น Admin (เช็คจาก Domain หรือ Logic ของคุณ)
+      if (ggEmail === "admin@mail.rmutk.ac.th") { // ตัวอย่างการเช็ค Admin
+         localStorage.setItem("role", "admin");
+      } else {
+         localStorage.setItem("role", "user");
+      }
+
+      window.location.href = "/";
+    }
+  }, [status, session]);
+
+  // --- 2. การล็อกอินผ่านอีเมล (Credentials) ---
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
@@ -19,27 +42,24 @@ export default function LoginPage() {
 
     const result = await signIn("credentials", {
       email,
-      redirect: false, // ปิดการ redirect เพื่อจัดการ localStorage ก่อน
+      redirect: false,
     });
 
     if (result?.ok) {
       try {
-        // 1. เรียก API ที่คุณเพิ่งเขียนไปเพื่อดึงชื่อจาก Database
+        // ดึงชื่อจาก Database มาซิงค์ (กรณีเคยมีชื่อใน DB แล้ว)
         const res = await fetch(`/api/prediction?email=${encodeURIComponent(email)}&mode=getName`);
         const userData = await res.json();
         
-        // 2. บันทึกข้อมูลลง LocalStorage (จุดที่เคยติดตัวแดง)
         localStorage.setItem("email", email);
         
-        // ถ้า userData.user_name มีค่าให้ใช้ชื่อนั้น ถ้าไม่มีให้ใช้ Prefix ของ Email แทน
-        const displayName = userData?.user_name || email.split('@')[0];
+        // ลำดับความสำคัญชื่อ: 1.จาก DB 2.จาก Google(ถ้ามี) 3.จากเลขหน้าอีเมล
+        const displayName = userData?.user_name || session?.user?.name || email.split('@')[0];
         localStorage.setItem("name", displayName);
 
-        // 3. ย้ายหน้าไปที่ Home
         window.location.href = "/"; 
       } catch (error) {
         console.error("Error during login data sync:", error);
-        // ถึงดึงชื่อไม่ได้ ก็ให้เซ็ต Email พื้นฐานไว้ป้องกัน Error หน้าถัดไป
         localStorage.setItem("email", email);
         window.location.href = "/";
       }
@@ -47,7 +67,7 @@ export default function LoginPage() {
       alert("เข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบอีเมล");
     }
   };
-  
+
   
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 lg:p-8">

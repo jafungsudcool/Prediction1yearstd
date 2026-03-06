@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import MainLayout from "@/components/MainLayout";
 import { useRouter } from 'next/navigation';
+import { useSession } from "next-auth/react"; // ใช้งาน Session
 import { BrainCircuit } from "lucide-react";
 
 // ================= KNN CONFIG (คงเดิม) =================
@@ -27,39 +28,44 @@ const distance = (a: number[], b: number[]) => Math.sqrt(a.reduce((s, v, i) => s
 
 const PredictPage = () => {
   const router = useRouter();
+  const { data: session, status } = useSession(); // ดึงสถานะการ Login
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [predictionResult, setPredictionResult] = useState<{ type: string, message: string, code: 'CS' | 'IT' } | null>(null);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [user, setUser] = useState({ email: "", name: "", role: "" });
   const [dbName, setDbName] = useState("");
   const [initialLoading, setInitialLoading] = useState(true); 
-
+  
   useEffect(() => {
     const initPage = async () => {
-      if (typeof window !== 'undefined') {
-        const savedEmail = localStorage.getItem("email");
-        const savedName = localStorage.getItem("name");
+      // 1. ตรวจสอบสถานะการโหลด Session
+      if (status === "loading") return;
 
-        // แก้ไข: ถ้าไม่มี Email ให้ Redirect ไปหน้า Login ทันที
-        if (!savedEmail) {
-          alert("ไม่พบข้อมูลผู้ใช้งาน กรุณาเข้าสู่ระบบใหม่อีกครั้ง");
-          router.push("/"); 
-          return;
-        }
+      // 2. ถ้าไม่ได้ Login ให้เด้งไปหน้าแรก
+      if (status === "unauthenticated") {
+        alert("กรุณาเข้าสู่ระบบก่อนใช้งาน");
+        router.push("/");
+        return;
+      }
+
+      // 3. ถ้า Login แล้ว ให้ใช้ข้อมูลจาก Session เป็นหลัก (เสถียรกว่า localStorage)
+      if (status === "authenticated" && session?.user?.email) {
+        const userEmail = session.user.email;
+        const userName = session.user.name || "";
 
         setUser({
-          email: savedEmail,
-          name: savedName || "",
-          role: localStorage.getItem("role") || "user"
+          email: userEmail,
+          name: userName,
+          role: "user"
         });
 
+        // ดึงชื่อจริงจาก DB มาอัปเดต UI
         try {
-          const res = await fetch(`/api/prediction?email=${encodeURIComponent(savedEmail)}&mode=getName`);
+          const res = await fetch(`/api/prediction?email=${encodeURIComponent(userEmail)}&mode=getName`);
           if (res.ok) {
             const userData = await res.json();
             if (userData?.user_name) {
               setDbName(userData.user_name);
-              localStorage.setItem("name", userData.user_name);
             }
           }
         } catch (error) {
@@ -70,7 +76,7 @@ const PredictPage = () => {
       }
     };
     initPage();
-  }, [router]);
+  }, [status, session, router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value, options, selectedIndex } = e.target;
@@ -89,7 +95,6 @@ const PredictPage = () => {
       return;
     }
 
-    // แก้ไข: เพิ่ม fallback || 0 ป้องกันค่า undefined
     const q1 = gradeMap[formData.q1] || 0;
     const q2 = gradeMap[formData.q2] || 0;
     const q3 = formData.q3 === "yes" ? 1 : 0;
@@ -118,30 +123,24 @@ const PredictPage = () => {
 
   const questionsData = [
     { id: 'q1', label: '1. ผลการเรียนในวิชาระเบียบวิธีการเขียนโปรแกรม (Programming Methodology)', options: [{ label: 'A', value: 'A' }, { label: 'B+', value: 'B+' }, { label: 'B', value: 'B' }, { label: 'C+', value: 'C+' }, { label: 'C', value: 'C' }, { label: 'D+', value: 'D+' }, { label: 'D', value: 'D' }] },
-    { id: 'q2', label: '2. ผลการเรียนในวิชาความน่าจะเป็นสำหรับวิทยาการคอมพิวเตอร์ (Probability for Computer Science)', options: [{ label: 'A', value: 'A' }, { label: 'B+', value: 'B+' }, { label: 'B', value: 'B' }, { label: 'C+', value: 'C+' }, { label: 'C', value: 'C' }, { label: 'D+', value: 'D+' }, { label: 'D', value: 'D' }] },
+    { id: 'q2', label: '2. ผลการเรียนในวิชาความน่าจะเป็นสำหรับวิทยาการคอมพิตเตอร์ (Probability for Computer Science)', options: [{ label: 'A', value: 'A' }, { label: 'B+', value: 'B+' }, { label: 'B', value: 'B' }, { label: 'C+', value: 'C+' }, { label: 'C', value: 'C' }, { label: 'D+', value: 'D+' }, { label: 'D', value: 'D' }] },
     { id: 'q3', label: '3. เคยเรียนเขียนโปรแกรมมาก่อนหรือไม่', options: [{ label: 'ใช่ เคยเรียน', value: 'yes' }, { label: 'ไม่เคยเรียน', value: 'no' }] },
     { id: 'q4', label: '4. มีความรู้เกี่ยวกับความแตกต่างของหลักสูตร CS และ IT มากแค่ไหน', options: [{ label: 'มากที่สุด', value: 'มากที่สุด' }, { label: 'มาก', value: 'มาก' }, { label: 'ปานกลาง', value: 'ปานกลาง' }, { label: 'น้อย', value: 'น้อย' }, { label: 'ไม่เข้าใจเลย', value: 'ไม่เข้าใจเลย' }] },
     { id: 'q5', label: '5. คุณสนใจที่จะทำงานในตำแหน่งใด', options: [{ label: "Data Scientist", value: "Data Scientist" }, { label: "AI Innovator", value: "AI Innovator" }, { label: "Software Developer", value: "Software Developer" }, { label: "Cyber Security Analyst", value: "Cyber Security Analyst" }, { label: "UX UI Designer", value: "UX UI Designer" }, { label: "DevOps Engineer", value: "DevOps Engineer" }, { label: "Tester / QA", value: "Tester / QA" }, { label: "IT Support / Administrator", value: "IT Support / Administrator" }, { label: "ยังไม่แน่ใจ", value: "ยังไม่แน่ใจ" }] },
   ];
 
   const saveAndRedirect = async () => {
-    // แก้ไข: ดึง Email สดๆ จาก LocalStorage ทันทีที่กดปุ่ม
-    const storageEmail = localStorage.getItem("email") || "";
-    const storageName = localStorage.getItem("name") || "";
-    const finalEmail = storageEmail || user.email;
+    // ดึง Email จาก Session เป็นที่ตั้ง
+    const finalEmail = session?.user?.email || user.email;
 
     if (!finalEmail) {
       alert("ไม่พบข้อมูล Email ในระบบ กรุณาเข้าสู่ระบบใหม่อีกครั้ง");
-      return;
-    }
-
-    if (!predictionResult) {
-      alert("กรุณาคำนวณผลลัพธ์ก่อนบันทึก");
+      router.push("/");
       return;
     }
 
     const studentIdOnly = finalEmail.split('@')[0];
-    const finalName = dbName || storageName || user.name || studentIdOnly || "ผู้ใช้งาน";
+    const finalName = dbName || user.name || studentIdOnly || "ผู้ใช้งาน";
 
     const summaryAnswer = questionsData.map((q, idx) => {
       const answerLabel = formData[`${q.id}_label`] || formData[q.id] || "ไม่ได้ตอบ";
@@ -153,7 +152,7 @@ const PredictPage = () => {
       student_id: studentIdOnly,
       name: finalName,
       answer: summaryAnswer,
-      result: predictionResult.code,
+      result: predictionResult?.code,
       mode: "savePrediction"
     };
 
@@ -176,7 +175,6 @@ const PredictPage = () => {
     }
   };
 
-  // ... (ส่วน SkeletonForm และ Return คงเดิมตามที่คุณเขียนไว้)
   const SkeletonForm = () => (
     <div className="space-y-8 animate-pulse">
       {[1, 2, 3, 4, 5].map((i) => (
