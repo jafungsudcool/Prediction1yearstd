@@ -11,6 +11,29 @@ export async function POST(req: Request) {
     const body = await req.json();
     console.log("--- Incoming POST Request ---", body.mode || "prediction");
 
+    if (body.mode === "getPrediction") {
+      try {
+        // 1. ยิงข้อมูลไปหา Python FastAPI (Port 8000)
+        const pyRes = await fetch("http://127.0.0.1:8000/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body.formData),
+        });
+
+        if (!pyRes.ok) throw new Error("FastAPI Error");
+        const aiData = await pyRes.json();
+
+        // 2. ส่งคำตอบกลับไปที่หน้าเว็บ เพื่อให้โชว์ Modal
+        return NextResponse.json({ 
+          success: true, 
+          prediction: aiData.prediction 
+        });
+
+      } catch (err) {
+        return NextResponse.json({ error: "ไม่สามารถเชื่อมต่อ AI Service ได้" }, { status: 500 });
+      }
+    }
+
     // 1. โหมดเพิ่มนักศึกษา (Admin)
     if (body.mode === "addUser") {
       const { student_id, email, user_name } = body;

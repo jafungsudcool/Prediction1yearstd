@@ -27,9 +27,19 @@ export default function DashboardPage() {
   }, []);
 
   const stats = [
-    { title: "จำนวนเข้าใช้งานทั้งหมด", value: dbData?.totalUsers?.toString() || "0", icon: <Users size={18} />, color: "bg-blue-500" },
-    { title: "แบบสอบถามที่ทำแล้ว", value: dbData?.myTotal || "0", icon: <BarChart3 size={18} />, color: "bg-indigo-500" },
-    { title: "ค่าเฉลี่ยความแม่นยำ", value: "87%", icon: <ArrowUpRight size={18} />, color: "bg-emerald-500" },
+    { title: "จำนวนเข้าใช้งานทั้งหมด", 
+      value: dbData?.totalUsers?.toString() || "0", 
+      icon: <Users size={18} />, 
+      color: "bg-blue-500" 
+    },
+    { title: "แบบสอบถามที่ทำแล้ว", 
+      value: dbData?.myTotal || "0", 
+      icon: <BarChart3 size={18} />,
+       color: "bg-indigo-500" 
+      },
+    { title: "ค่าเฉลี่ยความแม่นยำ", 
+      value: "82%", icon: <ArrowUpRight size={18} />, 
+      color: "bg-emerald-500" },
   ];
 
   const SkeletonLoader = () => (

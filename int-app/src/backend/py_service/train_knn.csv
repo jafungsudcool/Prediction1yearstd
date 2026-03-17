@@ -1,0 +1,228 @@
+Program,Prog.Methods,Probability,Experience,Career_Interest,Knowledge
+CS,C,B,Yes,Data Scientist,Fair
+CS,B,A,Yes,Data Scientist,Good
+CS,C,B+,Yes,Software Developer,Fair
+CS,C+,B+,No,Software Developer,Poor
+CS,B,A,Yes,Software Developer,Good
+CS,A,B,Yes,Software Developer,Good
+CS,A,A,Yes,Data Scientist,Excellent
+CS,C,C+,Yes,Tester / QA,Fair
+CS,C,B+,Yes,IT Support / Administrator,Fair
+CS,D,A,Yes,IT Support / Administrator,Fair
+CS,B,D,No,Data Scientist,Good
+CS,B,A,Yes,Data Scientist,Good
+CS,C,B,Yes,Software Developer,Fair
+CS,C,B+,Yes,Software Developer,Fair
+CS,D,A,No,IT Support / Administrator,Fair
+CS,C+,B+,Yes,Data Scientist,Poor
+CS,C+,C+,No,Data Scientist,Fair
+CS,A,B,Yes,DevOps Engineer,Good
+CS,B,C+,Yes,UX UI Designer,Excellent
+CS,A,A,No,Data Scientist,Poor
+CS,C+,B,Yes,Data Scientist,Excellent
+CS,C,B,Yes,Software Developer,Good
+CS,C,C+,Yes,Software Developer,Good
+CS,C+,B,Yes,Software Developer,Fair
+CS,B+,B,No,Data Scientist,Excellent
+CS,B,C,No,unsure,Excellent
+CS,B,A,No,unsure,Poor
+CS,B,B+,Yes,Data Scientist,Poor
+CS,C+,C+,No,Software Developer,Fair
+CS,B+,B+,Yes,Data Scientist,Excellent
+CS,A,A,Yes,Data Scientist,Poor
+CS,B+,B,Yes,UX UI Designer,Excellent
+CS,B,A,Yes,Data Scientist,Good
+CS,C+,B+,Yes,unsure,Fair
+CS,B,B+,No,Data Scientist,Excellent
+CS,B,B+,Yes,Software Developer,Fair
+CS,B,B+,Yes,Data Scientist,Good
+CS,C+,B,Yes,unsure,Fair
+CS,C,B+,No,Software Developer,Good
+CS,B,A,No,Software Developer,Good
+CS,B+,A,Yes,Software Developer,Good
+CS,C+,B+,Yes,unsure,Good
+CS,C+,A,Yes,Data Scientist,Good
+CS,B,A,Yes,Software Developer,Excellent
+CS,B,B+,Yes,Software Developer,Good
+CS,B+,A,Yes,Software Developer,Excellent
+CS,C,B+,Yes,unsure,Excellent
+CS,B,B+,Yes,Data Scientist,Good
+CS,C+,A,Yes,Software Developer,Excellent
+CS,C+,B+,Yes,unsure,Fair
+CS,C,B,Yes,unsure,Good
+CS,C,B,Yes,Software Developer,Poor
+CS,C,B,No,unsure,Fair
+CS,C+,A,Yes,Software Developer,Excellent
+CS,C+,B+,Yes,Data Scientist,Good
+CS,C+,B,Yes,unsure,Good
+CS,C,B+,Yes,Software Developer,Excellent
+CS,C+,B,No,Software Developer,Excellent
+CS,C+,C+,Yes,Software Developer,Good
+CS,C,B,Yes,Data Scientist,Fair
+CS,B,A,Yes,Software Developer,Excellent
+CS,C,B,Yes,Software Developer,Fair
+CS,C+,B,Yes,Software Developer,Fair
+CS,C,B+,No,Data Scientist,Fair
+CS,C+,B,Yes,Software Developer,Fair
+CS,C+,B+,Yes,Data Scientist,Poor
+CS,C,C+,Yes,Software Developer,Fair
+CS,C+,B,Yes,Software Developer,Fair
+CS,C,B+,Yes,Data Scientist,Good
+CS,C,B+,Yes,unsure,Good
+CS,C,B,Yes,Data Scientist,Excellent
+CS,C,C+,Yes,Software Developer,Fair
+IT,D+,B,Yes,IT Support / Administrator,Fair
+IT,C+,C+,No,unsure,Fair
+IT,D,C+,No,IT Support / Administrator,Fair
+IT,D,C+,No,UX UI Designer,Fair
+IT,A,C,Yes,unsure,Good
+IT,B,B+,No,unsure,None
+IT,C+,C+,No,Data Scientist,Fair
+IT,B,B,Yes,IT Support / Administrator,Good
+IT,C+,C+,No,IT Support / Administrator,Fair
+IT,D,C+,No,unsure,Fair
+IT,D+,B,Yes,IT Support / Administrator,Poor
+IT,D,B,No,IT Support / Administrator,Fair
+IT,B,C,No,Software Developer,Good
+IT,A,A,Yes,Data Scientist,Excellent
+IT,D,B,No,IT Support / Administrator,Fair
+IT,D,C+,No,IT Support / Administrator,Fair
+IT,D,C+,No,AI Innovator,Fair
+IT,A,C+,Yes,unsure,Good
+IT,D,C+,No,unsure,Fair
+IT,D+,C,No,Tester / QA,Poor
+CS,B+,B,Yes,Data Scientist,Fair
+CS,C,B,No,unsure,Fair
+CS,D+,C,No,Software Developer,Fair
+CS,A,B+,Yes,unsure,Fair
+CS,B+,B+,Yes,unsure,Excellent
+CS,D+,B,Yes,unsure,Fair
+CS,B,C+,No,Software Developer,Good
+CS,D,C,Yes,AI Innovator,Fair
+CS,C+,B+,Yes,unsure,Fair
+CS,C+,B,No,unsure,Fair
+CS,C+,C+,Yes,unsure,Fair
+CS,C+,B+,Yes,Data Scientist,Fair
+CS,C,C+,Yes,Software Developer,Good
+CS,C+,B+,Yes,Software Developer,Poor
+CS,D+,B+,Yes,Data Scientist,Fair
+CS,B+,A,Yes,AI Innovator,Good
+CS,B,A,No,Software Developer,Fair
+CS,A,A,No,Data Scientist,Fair
+CS,D+,C,Yes,Software Developer,Fair
+CS,D+,B,Yes,unsure,Fair
+CS,B,C+,No,Software Developer,Good
+CS,C+,C,Yes,IT Support / Administrator,Poor
+CS,D,D,Yes,Software Developer,Fair
+CS,C,A,No,unsure,Poor
+CS,D+,B+,Yes,unsure,Fair
+CS,D+,B,Yes,Data Scientist,Fair
+CS,C+,C+,Yes,Data Scientist,Fair
+CS,C+,B+,No,Software Developer,Fair
+CS,B,A,Yes,UX UI Designer,Excellent
+CS,C,B,Yes,Data Scientist,Good
+CS,B,B+,Yes,Software Developer,Fair
+CS,C,A,Yes,Cyber Security Analyst,Good
+CS,C,B+,Yes,Software Developer,Good
+CS,C+,B+,Yes,Software Developer,Good
+IT,D+,C+,No,Software Developer,Fair
+IT,C,C,No,Cyber Security Analyst,Fair
+IT,C,C+,Yes,Software Developer,Poor
+IT,D+,C,No,Software Developer,Good
+IT,B,B+,Yes,unsure,Fair
+IT,B+,C+,No,Data Scientist,Excellent
+IT,D+,C,No,unsure,Fair
+IT,B,A,No,unsure,None
+IT,B,C+,No,Software Developer,Good
+IT,D+,C+,No,Software Developer,Fair
+IT,A,B+,Yes,Cyber Security Analyst,Poor
+IT,B+,A,No,Data Scientist,Fair
+IT,B+,B+,Yes,unsure,Excellent
+IT,D+,C,No,Software Developer,Fair
+IT,C,B,No,Software Developer,Fair
+IT,C+,C+,Yes,Data Scientist,Fair
+IT,C,B,Yes,Software Developer,Fair
+IT,B,C+,No,Software Developer,Good
+IT,C+,B,Yes,Software Developer,Good
+IT,C,B,Yes,Data Scientist,Fair
+IT,C,B+,No,Software Developer,Good
+IT,C,C,Yes,Software Developer,Good
+CS,B,B,Yes,Software Developer,Good
+CS,C,B+,Yes,Software Developer,Fair
+CS,C,C,Yes,Software Developer,Fair
+CS,B,A,No,unsure,Excellent
+CS,A,B+,Yes,Software Developer,None
+CS,A,A,No,Software Developer,Good
+CS,A,B,Yes,Software Developer,Fair
+CS,B,B,No,Software Developer,Fair
+CS,C+,A,Yes,Software Developer,Fair
+CS,A,B+,Yes,Software Developer,Good
+CS,A,B+,Yes,unsure,Poor
+CS,C+,A,Yes,Software Developer,Fair
+CS,B,C,No,unsure,Excellent
+CS,B,B,Yes,Software Developer,Good
+CS,B,C,Yes,Software Developer,Good
+CS,C+,C+,Yes,Software Developer,Excellent
+CS,A,B,Yes,Software Developer,Fair
+CS,C+,C+,Yes,Software Developer,Fair
+CS,A,B,Yes,unsure,Good
+CS,C,C,Yes,Software Developer,Fair
+CS,A,B+,Yes,Software Developer,Good
+CS,C+,B+,No,Software Developer,Good
+CS,B,A,Yes,Software Developer,Fair
+CS,A,A,Yes,Data Scientist,Good
+CS,B+,A,Yes,unsure,Fair
+CS,C,C,Yes,Software Developer,Fair
+IT,D+,C+,Yes,IT Support / Administrator,Poor
+IT,C,C+,No,IT Support / Administrator,Fair
+IT,C+,B,Yes,UX UI Designer,Fair
+IT,C,C,No,Software Developer,Fair
+IT,C+,C+,Yes,Software Developer,Good
+IT,C+,B,Yes,Software Developer,Good
+IT,C+,B,No,unsure,None
+IT,C+,C,Yes,unsure,Fair
+IT,D,B,No,Software Developer,Fair
+IT,D+,C,Yes,IT Support / Administrator,Poor
+IT,A,A,Yes,Data Scientist,Fair
+IT,C+,A,No,Software Developer,Fair
+IT,C,C+,Yes,UX UI Designer,Fair
+IT,C+,B,Yes,UX UI Designer,None
+IT,B,B,No,unsure,Fair
+IT,C,C+,Yes,Software Developer,Fair
+IT,B,B+,No,unsure,Poor
+IT,B+,B,Yes,DevOps Engineer,Fair
+IT,C,C+,No,Software Developer,Fair
+IT,D,C+,Yes,unsure,Fair
+IT,B,B+,No,Software Developer,Poor
+IT,B,C+,Yes,unsure,Fair
+IT,C,B,No,Software Developer,Good
+IT,C+,B+,Yes,Data Scientist,Good
+IT,B,B,No,UX UI Designer,Poor
+IT,D,B,No,Software Developer,Fair
+IT,B+,C+,No,Software Developer,Poor
+IT,D+,C+,No,unsure,Poor
+IT,C,B,Yes,UX UI Designer,Poor
+IT,C,C+,No,Software Developer,Fair
+IT,C+,B,Yes,Software Developer,None
+IT,B+,A,No,DevOps Engineer,Fair
+IT,D+,B,Yes,Software Developer,Good
+IT,C+,C,No,Data Scientist,Fair
+IT,C+,B,Yes,Data Scientist,Poor
+IT,D,C,No,unsure,Poor
+IT,D+,B,No,UX UI Designer,Fair
+IT,C,B,Yes,Data Scientist,Good
+IT,A,A,No,unsure,Fair
+IT,C,C+,Yes,Software Developer,Good
+IT,D+,C+,No,unsure,Good
+IT,B+,B+,No,UX UI Designer,Excellent
+IT,B,C+,Yes,UX UI Designer,Fair
+IT,B,B,Yes,unsure,Excellent
+IT,C,C+,Yes,Software Developer,Good
+IT,B,B+,No,unsure,Poor
+IT,B+,C+,No,IT Support / Administrator,Fair
+IT,B+,C+,No,Software Developer,Good
+IT,B+,B+,Yes,Software Developer,Good
+IT,C,B,No,Software Developer,Fair
+IT,B+,C+,No,Software Developer,Poor
+IT,D+,C,No,unsure,Good
+IT,B+,B+,Yes,Software Developer,Good

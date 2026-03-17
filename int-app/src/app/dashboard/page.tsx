@@ -44,7 +44,7 @@ export default function AdminDashboardPage() {
     },
     { 
       title: "ความแม่นยำของแบบจำลอง", 
-      value: "87",
+      value: "82",
       unit: "%",
       icon: <BadgePercent size={20} />, 
       color: "bg-emerald-600" 
