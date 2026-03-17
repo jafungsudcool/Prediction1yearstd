@@ -141,7 +141,7 @@ export default function ManageModelPage() {
         {/* --- Tab Content: Update Model --- */}
         {activeTab === 'model' && (
           <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <h2 className="text-xl font-black text-slate-800 mb-8 flex items-center gap-3">
+            <h2 className="text-lg font-black text-slate-800 mb-8 flex items-center gap-3">
               <Settings className="text-indigo-500" /> ปรับปรุงข้อมูลพยากรณ์
             </h2>
             
@@ -149,8 +149,8 @@ export default function ManageModelPage() {
               <div>
                 <label className="block mb-3 font-bold text-slate-700">เลือกโมเดลที่ใช้</label>
               <select 
-                value={selectedModel} // ✅ ผูกค่ากับ State
-                onChange={(e) => setSelectedModel(e.target.value)} // ✅ อัปเดตเมื่อเปลี่ยน
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
                 className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-indigo-500 transition-all"
               >
                 <option value="Random Forest">Random Forest</option>

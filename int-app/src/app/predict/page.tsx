@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from "next-auth/react"; 
 import { BrainCircuit } from "lucide-react";
 
-// ================= KNN CONFIG (คงเดิม) =================
+// ================= KNN CONFIG =================
 const trainData = [
   { x: [4, 3.5, 1, 3, 1], label: "CS" },
   { x: [3, 2.5, 0, 1, 7], label: "IT" },
@@ -17,7 +17,7 @@ const trainData = [
 ];
 
 const gradeMap: Record<string, number> = { "A": 4, "B+": 3.5, "B": 3, "C+": 2.5, "C": 2, "D+": 1.5, "D": 1 };
-const understandMap: Record<string, number> = { "มากที่สุด": 4, "มาก": 3, "ปานกลาง": 2, "น้อย": 1, "ไม่เข้าใจเลย": 0 };
+const knowledgeMap: Record<string, number> = { "มากที่สุด": 4, "มาก": 3, "ปานกลาง": 2, "น้อย": 1, "ไม่เข้าใจเลย": 0 };
 const jobMap: Record<string, number> = { 
   "Data Scientist": 0, "AI Innovator": 1, "Software Developer": 2, 
   "Cyber Security Analyst": 3, "UX UI Designer": 4, "DevOps Engineer": 5, 
@@ -89,10 +89,10 @@ const PredictPage = () => {
     const isComplete = requiredKeys.every(key => formData[key] && formData[key] !== "");
     if (!isComplete) { alert("กรุณาตอบคำถามให้ครบทุกข้อ"); return; }
 
-    const q1 = gradeMap[formData.q1] || 0;
+    const q1 = formData.q1 === "yes" ? 1 : 0;
     const q2 = gradeMap[formData.q2] || 0;
-    const q3 = formData.q3 === "yes" ? 1 : 0;
-    const q4 = understandMap[formData.q4] || 0;
+    const q3 = gradeMap[formData.q3] || 0;
+    const q4 = knowledgeMap[formData.q4] || 0;
     const q5 = jobMap[formData.q5] || 0;
 
     const inputVector = [q1, q2, q3, q4, q5];
@@ -121,11 +121,11 @@ const PredictPage = () => {
     const finalName = dbName || user.name || studentIdOnly;
 
     const summaryAnswer = [  
-      `1. Previous Experience: ${formData.q3_label}`,
-      `2. Probability: ${formData.q2_label}`,
-      `3. Programming: ${formData.q1_label}`,
-      `4. Understanding: ${formData.q4_label}`,
-      `5. Job Interest: ${formData.q5_label}`
+      `1. Previous Experience : ${formData.q1_label}`,
+      `2. Probability : ${formData.q2_label}`,
+      `3. Programming : ${formData.q3_label}`,
+      `4. Knowledge CS IT : ${formData.q4_label}`,
+      `5. Job Interest : ${formData.q5_label}`
     ].join(" | ");
 
     const payload = {

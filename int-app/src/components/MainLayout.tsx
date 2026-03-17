@@ -62,13 +62,12 @@ export default function MainLayout({ children, pageTitle }: MainLayoutProps) {
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-2 mb-4">Main Menu</p>
           
           {menuItems
-            // 1. กรองออกก่อน (Filter)
             .filter(item => {
               if (item.adminOnly && !isAdmin) return false; // ถ้าเป็นเมนู Admin แต่เราไม่ใช่ Admin ไม่ต้องเอามา
               if (item.userOnly && isAdmin) return false; // ถ้าเป็นเมนู User แต่เราเป็น Admin ไม่ต้องเอามา
               return true; 
             })
-            // 2. ค่อยเอาตัวที่ผ่านการกรองมาวาด (Map)
+            // 2. Mapping
             .map((item, idx) => {
               const isActive = pathname === item.href;
               return (
@@ -90,13 +89,13 @@ export default function MainLayout({ children, pageTitle }: MainLayoutProps) {
         <header className="h-20 bg-white border-b border-slate-100 flex items-center justify-between px-6 lg:px-10">
           <div className="flex items-center gap-4">
             <button className="lg:hidden p-2 text-slate-600" onClick={() => setIsSidebarOpen(true)}><Menu size={24} /></button>
-            <h2 className="text-xl lg:text-2xl font-extrabold text-slate-800">{pageTitle}</h2>
+            <h2 className="text-lg lg:text-xl font-extrabold text-slate-800">{pageTitle}</h2>
           </div>
 
           <div className="relative" ref={profileRef}>
             <div className="flex items-center zgap-3 p-1.5 pr-4 bg-slate-50 rounded-2xl cursor-pointer hover:bg-slate-100 transition-all" onClick={() => setIsProfileOpen(!isProfileOpen)}>
               <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold">
-                {session?.user?.email?.charAt(0).toUpperCase() || "U"}
+                <User size={16} />
               </div>
               <div className="hidden sm:block text-left">
                 <p className="text-sm font-bold text-slate-800 leading-tight">{session?.user?.email?.split('@')[0] || "User"}</p>

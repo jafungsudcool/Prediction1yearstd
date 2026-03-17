@@ -168,7 +168,7 @@ export default function HistoryUserPage() {
         </div>
       )}
 
-      {/* --- Modal (คงเดิมตาม Logic ล่าสุดที่ต้องการ) --- */}
+      {/* --- Modal detail --- */}
       {selectedItem && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4" 
           onClick={() => setSelectedItem(null)}>
